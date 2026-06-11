@@ -1,0 +1,15 @@
+/node_modules
+/.next
+/out
+/build
+.DS_Store
+*.pem
+.env*
+!.env.example
+next-env.d.ts
+.vercel
+*.tsbuildinfo
+
+# Original-resolution source images — app serves optimized copies from public/photos/
+/proposal-photos
+/source-material
