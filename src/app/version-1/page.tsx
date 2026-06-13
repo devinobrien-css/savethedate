@@ -177,8 +177,8 @@ export default function VersionOne() {
               </div>
               <div id="dress" className="scroll-mt-24">
                 <p className="text-[11px] uppercase tracking-widest2 text-v1-sky">Dress</p>
-                <p className="mt-3 font-display text-2xl">Cocktail</p>
-                <p className="mt-1 text-sm text-v1-mist">City-chic, evening elegant</p>
+                <p className="mt-3 font-display text-2xl">{wedding.dressCode}</p>
+                <p className="mt-1 text-sm text-v1-mist">{wedding.dressCodeNote}</p>
               </div>
             </div>
             <div className="mt-14">

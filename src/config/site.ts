@@ -41,6 +41,9 @@ export type WeddingDetails = {
   ceremonyHeading: string;
   ceremonyNote: string;
   rsvpByLabel: string;
+  /** Dress code — short label + a one-line descriptor */
+  dressCode: string;
+  dressCodeNote: string;
 };
 
 /** ── EDIT ME ──────────────────────────────────────────────────────────── */
@@ -62,7 +65,51 @@ export const wedding: WeddingDetails = {
   ceremonyNote:
     "The finer details — ceremony time, schedule, and all that follows — are still coming together. We simply couldn't wait to share the date. Full details to follow.",
   rsvpByLabel: "Kindly respond by June 1, 2027",
+  dressCode: "Cocktail",
+  dressCodeNote: "City-chic, evening elegant",
 };
+
+/**
+ * Directory links shown on the home page (/). Each is toggled by an env flag
+ * (shown unless the flag is set to "false"); the page resolves flag/href.
+ */
+export type NavLink = {
+  label: string;
+  caption: string;
+  href: string;
+  /** Env var that toggles visibility — defaults to shown unless "false". */
+  flag: string;
+  /** Optional env var holding an external URL that overrides href when set. */
+  hrefEnv?: string;
+};
+
+export const navLinks: NavLink[] = [
+  {
+    label: "Save the Date",
+    caption: "Our date & story",
+    href: "/save-the-date",
+    flag: "NAV_SAVE_THE_DATE",
+  },
+  {
+    label: "Location & Time",
+    caption: "Where & when we'll celebrate",
+    href: "/location",
+    flag: "NAV_LOCATION_TIME",
+  },
+  {
+    label: "Dress Code",
+    caption: "What to wear",
+    href: "/dress-code",
+    flag: "NAV_DRESS_CODE",
+  },
+  {
+    label: "Registry & Gifts",
+    caption: "Your presence is the present",
+    href: "#",
+    flag: "NAV_REGISTRY",
+    hrefEnv: "REGISTRY_URL",
+  },
+];
 
 /** All curated proposal photos (portrait, golden hour). */
 export const galleryPhotos = [
