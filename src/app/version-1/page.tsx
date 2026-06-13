@@ -58,6 +58,9 @@ export default function VersionOne() {
                 </span>
                 {wedding.partnerB}
               </h1>
+              <p className="mt-2 font-sans text-sm sm:text-base uppercase tracking-[0.25em]">
+                are getting married
+              </p>
               <div className="mt-8 flex items-center gap-4 animate-fade-up [animation-delay:200ms]">
                 <span className="h-px w-10 bg-v1-mist/60" />
                 <p className="text-sm sm:text-base uppercase tracking-widest2">
@@ -65,6 +68,12 @@ export default function VersionOne() {
                 </p>
                 <span className="h-px w-10 bg-v1-mist/60" />
               </div>
+              <a
+                href="#rsvp"
+                className="mt-20 sm:mt-24 inline-block animate-fade-up [animation-delay:400ms] border border-v1-blush/70 bg-transparent px-10 py-3.5 font-sans text-[11px] uppercase tracking-widest2 text-v1-blush transition-colors duration-300 hover:bg-v1-blush hover:text-v1-ink"
+              >
+                RSVP Now
+              </a>
             </div>
 
             {/* scroll cue */}
@@ -152,7 +161,7 @@ export default function VersionOne() {
 
       {/* ───────────── DETAILS ───────────── */}
       {f.details && (
-        <section className="bg-v1-ink text-v1-paper py-24 sm:py-32 px-6">
+        <section id="details" className="bg-v1-ink text-v1-paper py-24 sm:py-32 px-6 scroll-mt-0">
           <Reveal className="mx-auto max-w-3xl text-center">
             <h2 className="font-display text-3xl sm:text-5xl">The Details</h2>
             <div className="mt-12 grid sm:grid-cols-3 gap-10 text-center">
@@ -166,7 +175,7 @@ export default function VersionOne() {
                 <p className="mt-3 font-display text-2xl">{wedding.venueName}</p>
                 <p className="mt-1 text-sm text-v1-mist">{wedding.venueAddress}</p>
               </div>
-              <div>
+              <div id="dress" className="scroll-mt-24">
                 <p className="text-[11px] uppercase tracking-widest2 text-v1-sky">Dress</p>
                 <p className="mt-3 font-display text-2xl">Cocktail</p>
                 <p className="mt-1 text-sm text-v1-mist">City-chic, evening elegant</p>
@@ -185,14 +194,17 @@ export default function VersionOne() {
       {/* ───────────── RSVP ───────────── */}
       {f.rsvp && (
         <section id="rsvp" className="bg-v1-paper py-24 sm:py-28 px-6">
-          <Reveal className="mx-auto max-w-2xl text-center mb-10">
+          <Reveal className="mx-auto max-w-2xl text-center mb-12">
             <h2 className="font-display text-3xl sm:text-5xl text-v1-ink">RSVP</h2>
-            <p className="mt-3 text-[11px] uppercase tracking-widest2 text-v1-denim">
+            <div className="mx-auto mt-5 h-px w-14 bg-v1-blush" />
+            <p className="mt-5 text-[11px] uppercase tracking-widest2 text-v1-denim">
               {wedding.rsvpByLabel}
             </p>
           </Reveal>
           <Reveal className="mx-auto max-w-2xl">
-            <RSVPForm variant="v1" />
+            <div className="border border-v1-ink/10 border-t-2 border-t-v1-blush bg-white px-7 py-10 sm:px-12 sm:py-12 shadow-[0_24px_60px_-28px_rgba(30,42,58,0.4)]">
+              <RSVPForm variant="v1" />
+            </div>
           </Reveal>
         </section>
       )}

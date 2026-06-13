@@ -33,10 +33,10 @@ const themes: Record<
 > = {
   v1: {
     field:
-      "border border-v1-mist bg-white/70 focus:border-v1-denim focus:ring-v1-denim/30 rounded-none text-v1-ink placeholder:text-v1-sky/70",
+      "border border-v1-mist bg-white focus:border-v1-denim focus:ring-v1-denim/25 rounded-none text-v1-ink placeholder:text-v1-sky/70",
     label: "text-v1-denim uppercase tracking-widest2 text-xs font-sans",
     button:
-      "bg-v1-ink text-v1-paper hover:bg-v1-navy tracking-widest2 uppercase text-sm rounded-none",
+      "bg-v1-blush text-v1-ink hover:bg-v1-ink hover:text-v1-blush tracking-widest2 uppercase text-sm rounded-none",
     radioActive: "bg-v1-ink text-white border-v1-ink",
     radioIdle: "border-v1-mist text-v1-denim hover:border-v1-denim",
     success: "text-v1-navy",
@@ -46,7 +46,7 @@ const themes: Record<
       "border border-v2-taupe bg-v2-linen focus:border-v2-caramel focus:ring-v2-caramel/30 rounded-lg text-v2-espresso placeholder:text-v2-walnut/50",
     label: "text-v2-walnut uppercase tracking-[0.22em] text-xs font-sans",
     button:
-      "bg-v2-walnut text-v2-linen hover:bg-v2-espresso tracking-[0.18em] uppercase text-sm rounded-lg",
+      "bg-v2-terracotta text-v2-espresso hover:bg-v2-espresso hover:text-v2-terracotta tracking-[0.18em] uppercase text-sm rounded-lg",
     radioActive: "bg-v2-walnut text-v2-linen border-v2-walnut",
     radioIdle: "border-v2-taupe text-v2-walnut hover:border-v2-caramel",
     success: "text-v2-walnut",
@@ -56,7 +56,7 @@ const themes: Record<
       "border-0 border-b border-v3-powder bg-transparent focus:border-v3-delft focus:ring-0 rounded-none text-v3-ink placeholder:text-v3-periwinkle/60 px-0",
     label: "text-v3-delft uppercase tracking-[0.28em] text-xs font-sans",
     button:
-      "bg-v3-delft text-white hover:bg-v3-ink tracking-[0.22em] uppercase text-sm rounded-full",
+      "bg-v3-periwinkle text-v3-ink hover:bg-v3-ink hover:text-v3-periwinkle tracking-[0.22em] uppercase text-sm rounded-full",
     radioActive: "bg-v3-delft text-white border-v3-delft",
     radioIdle: "border-v3-powder text-v3-delft hover:border-v3-delft",
     success: "text-v3-delft",

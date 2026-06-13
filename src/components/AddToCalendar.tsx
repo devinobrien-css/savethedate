@@ -22,7 +22,7 @@ export default function AddToCalendar({ variant }: { variant: Variant }) {
         Add to Google Calendar
       </a>
       <a href={icsDataUrl()} download={`${fileName}.ics`} className={cls}>
-        Download .ics
+        Add to Apple Calendar
       </a>
     </div>
   );

@@ -57,7 +57,7 @@ export const wedding: WeddingDetails = {
   city: "Manhattan, New York",
   proposalPlace: "Central Park, New York City",
   message:
-    "After a sunlit morning in Central Park and a question with only one answer, we'd be honored to have you celebrate with us.",
+    "After a sunlit afternoon in Central Park and a question with only one answer, we'd be honored to have you celebrate with us.",
   ceremonyHeading: "Ceremony details to come",
   ceremonyNote:
     "The finer details — ceremony time, schedule, and all that follows — are still coming together. We simply couldn't wait to share the date. Full details to follow.",
