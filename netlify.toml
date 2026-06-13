@@ -10,6 +10,10 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  # These are not secrets (public project URL, sender address, site URL), so
+  # exclude them from Netlify's secret scanner. The real secrets
+  # (SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, ADMIN_*, DATABASE_URL) are still scanned.
+  SECRETS_SCAN_OMIT_KEYS = "SUPABASE_URL,RESEND_FROM,SITE_URL"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
