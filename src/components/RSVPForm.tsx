@@ -1,8 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Variant = "v1" | "v2" | "v3";
+
+// Remembers a guest's submitted RSVP across page refreshes (client-only).
+const STORAGE_KEY = "std_rsvp";
+type SavedRsvp = { firstName: string; attending: "yes" | "no" };
+
+function loadSaved(): SavedRsvp | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<SavedRsvp>;
+    if (parsed.attending !== "yes" && parsed.attending !== "no") return null;
+    return { firstName: parsed.firstName || "", attending: parsed.attending };
+  } catch {
+    return null;
+  }
+}
 
 const themes: Record<
   Variant,
@@ -55,6 +71,20 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
   const [status, setStatus] = useState<Status>("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [guests, setGuests] = useState("1");
+  const [savedName, setSavedName] = useState("");
+  // Gate first paint on the localStorage check so returning guests don't see
+  // the empty form flash before their saved confirmation appears.
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const saved = loadSaved();
+    if (saved) {
+      setAttending(saved.attending);
+      setSavedName(saved.firstName);
+      setStatus("success");
+    }
+    setReady(true);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,6 +93,7 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
     const data = new FormData(e.currentTarget);
     data.set("attending", attending);
     data.set("guests", attending === "yes" ? guests : "0");
+    data.set("variant", variant);
 
     setStatus("submitting");
     setErrorMsg("");
@@ -72,6 +103,16 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "Something went wrong. Please try again.");
       }
+      const firstName = String(data.get("firstName") || "");
+      try {
+        localStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({ firstName, attending } satisfies SavedRsvp)
+        );
+      } catch {
+        /* storage may be unavailable (private mode) — non-fatal */
+      }
+      setSavedName(firstName);
       setStatus("success");
     } catch (err) {
       setStatus("error");
@@ -79,22 +120,46 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
     }
   };
 
+  const updateResponse = () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      /* non-fatal */
+    }
+    setStatus("idle");
+    setAttending(null);
+    setErrorMsg("");
+  };
+
   const submitted = status === "success";
 
   const inputBase =
     "w-full px-4 py-3 font-sans text-sm outline-none focus:ring-2 transition-colors";
+
+  // Avoid rendering form vs. confirmation until we've read localStorage.
+  // Matches the server-rendered output (ready=false) so there's no hydration mismatch.
+  if (!ready) {
+    return <div className="py-10" aria-hidden="true" />;
+  }
 
   if (submitted) {
     return (
       <div className="text-center py-10 animate-fade-up">
         <p className={`font-display text-2xl sm:text-3xl ${t.success}`}>
           {attending === "no"
-            ? "We'll miss you — thank you for letting us know."
-            : "Wonderful — we can't wait to celebrate with you!"}
+            ? `We'll miss you${savedName ? `, ${savedName}` : ""} — thank you for letting us know.`
+            : `Wonderful${savedName ? `, ${savedName}` : ""} — we can't wait to celebrate with you!`}
         </p>
         <p className="mt-3 font-sans text-sm opacity-70">
           Your response has been noted.
         </p>
+        <button
+          type="button"
+          onClick={updateResponse}
+          className={`mt-6 font-sans text-xs underline underline-offset-4 opacity-60 transition-opacity hover:opacity-100 ${t.success}`}
+        >
+          Need to update your response?
+        </button>
       </div>
     );
   }

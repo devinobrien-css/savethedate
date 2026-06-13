@@ -27,8 +27,8 @@ export function googleCalendarUrl(): string {
   return `https://www.google.com/calendar/render?${params.toString()}`;
 }
 
-/** Builds an .ics file body and returns a data URL for download. */
-export function icsDataUrl(): string {
+/** Builds a raw .ics file body (for serving from an endpoint or download). */
+export function icsBody(): string {
   const { start, end } = eventWindow();
   const lines = [
     "BEGIN:VCALENDAR",
@@ -45,5 +45,10 @@ export function icsDataUrl(): string {
     "END:VEVENT",
     "END:VCALENDAR",
   ];
-  return `data:text/calendar;charset=utf8,${encodeURIComponent(lines.join("\r\n"))}`;
+  return lines.join("\r\n");
+}
+
+/** Builds an .ics file body and returns a data URL for download. */
+export function icsDataUrl(): string {
+  return `data:text/calendar;charset=utf8,${encodeURIComponent(icsBody())}`;
 }

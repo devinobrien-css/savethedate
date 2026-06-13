@@ -184,7 +184,7 @@ export default function VersionOne() {
 
       {/* ───────────── RSVP ───────────── */}
       {f.rsvp && (
-        <section className="bg-v1-paper py-24 sm:py-28 px-6">
+        <section id="rsvp" className="bg-v1-paper py-24 sm:py-28 px-6">
           <Reveal className="mx-auto max-w-2xl text-center mb-10">
             <h2 className="font-display text-3xl sm:text-5xl text-v1-ink">RSVP</h2>
             <p className="mt-3 text-[11px] uppercase tracking-widest2 text-v1-denim">

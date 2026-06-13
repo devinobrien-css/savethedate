@@ -189,7 +189,7 @@ export default function VersionTwo() {
 
       {/* ───────────── RSVP ───────────── */}
       {f.rsvp && (
-        <section className="bg-v2-cream/60 py-24 sm:py-28 px-6">
+        <section id="rsvp" className="bg-v2-cream/60 py-24 sm:py-28 px-6">
           <Reveal className="mx-auto max-w-2xl text-center mb-10">
             <h2 className="font-display text-3xl sm:text-4xl text-v2-walnut">
               Will you join us?

@@ -8,6 +8,7 @@ import {
 } from "@/lib/supabase";
 import { wedding } from "@/config/site";
 import LoginForm from "./LoginForm";
+import DeleteRsvpButton from "./DeleteRsvpButton";
 import { logout } from "./actions";
 
 export const metadata: Metadata = {
@@ -126,6 +127,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3 font-medium">Party</th>
                   <th className="px-4 py-3 font-medium">Note</th>
                   <th className="px-4 py-3 font-medium">Received</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-neutral-800">
@@ -158,6 +160,14 @@ export default async function AdminPage() {
                         day: "numeric",
                         year: "numeric",
                       })}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end">
+                        <DeleteRsvpButton
+                          id={r.id}
+                          name={`${r.first_name} ${r.last_name}`}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))}

@@ -202,7 +202,7 @@ export default function VersionThree() {
 
       {/* ───────────── RSVP ───────────── */}
       {f.rsvp && (
-        <section className="px-6 py-20 sm:py-28 bg-v3-haze/50">
+        <section id="rsvp" className="px-6 py-20 sm:py-28 bg-v3-haze/50">
           <Reveal className="mx-auto max-w-2xl text-center mb-10">
             <h2 className="font-serif text-3xl sm:text-4xl font-light text-v3-ink">
               Kindly Reply

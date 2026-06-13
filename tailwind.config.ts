@@ -5,37 +5,44 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Version 1 — Modern New York (scheme1: dusty/denim blues, blush, butter)
+        // ──────────────────────────────────────────────────────────────
+        //  POWDER BLUE — soft · romantic · refined
+        //  Shared palette across all three designs:
+        //  powder blue · ivory · gold · white · greenery, over deep navy.
+        //  Token names are kept per-version so existing classNames still
+        //  resolve; all three now map to this one palette.
+        // ──────────────────────────────────────────────────────────────
+        // Version 1
         v1: {
-          ink: "#1c2433",
-          navy: "#3a557e",
-          denim: "#4a6896",
-          sky: "#8fa9c9",
-          mist: "#b8c8dc",
-          blush: "#e8c4ab",
-          butter: "#f6e7c3",
-          paper: "#f4f6f9",
+          ink: "#1e2a3a", // deep navy
+          navy: "#2d4258", // navy
+          denim: "#5e7896", // powder-blue accent
+          sky: "#8aa6c4", // light blue (on dark)
+          mist: "#c2d2e1", // powder blue, soft
+          blush: "#c8a23a", // gilded gold (script accents)
+          butter: "#e4c66b", // light gilded gold
+          paper: "#f3ecdc", // ivory
         },
-        // Version 2 — Connecticut backyard (scheme2: warm earth tones)
+        // Version 2
         v2: {
-          espresso: "#3d2b22",
-          walnut: "#6f4a32",
-          caramel: "#a9743f",
-          terracotta: "#bd7e54",
-          taupe: "#d8c1ad",
-          cream: "#f3ead9",
-          sand: "#e7d6bf",
-          linen: "#faf4ea",
+          espresso: "#1e2a3a", // deep navy
+          walnut: "#2d4258", // navy (headings)
+          caramel: "#5e7896", // powder-blue accent
+          terracotta: "#c8a23a", // gilded gold
+          taupe: "#b9c6d3", // soft powder-gray (borders)
+          cream: "#efe7d6", // ivory
+          sand: "#e7dcc6", // sand / soft ivory
+          linen: "#fbf7ee", // lightest ivory
         },
-        // Version 3 — New England floral (scheme3: romantic blue delphinium)
+        // Version 3
         v3: {
-          ink: "#33475b",
-          delft: "#5f7fa6",
-          periwinkle: "#8ba4c9",
-          powder: "#bccfe3",
-          haze: "#dde7f2",
-          sage: "#9fb09a",
-          white: "#fbfcfe",
+          ink: "#1e2a3a", // deep navy
+          delft: "#5e7896", // powder-blue accent
+          periwinkle: "#c8a23a", // gilded gold (floral accents)
+          powder: "#c2d2e1", // powder blue, soft
+          haze: "#dde6ef", // powder blue, lightest
+          sage: "#7c8d60", // greenery
+          white: "#fcfdff", // white
         },
       },
       fontFamily: {

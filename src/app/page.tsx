@@ -5,20 +5,20 @@ import { wedding, versions } from "@/config/site";
 const cards = [
   {
     cfg: versions.v1,
-    blurb: "Modern New York — sleek, editorial, city-light drama.",
-    swatches: ["#1c2433", "#4a6896", "#8fa9c9", "#e8c4ab"],
+    blurb: "Powder blue & gold — sleek, editorial, refined.",
+    swatches: ["#9fb8d0", "#f3ecdc", "#c8a23a", "#ffffff", "#7c8d60"],
     tone: "from-v1-ink/80 to-v1-ink/30",
   },
   {
     cfg: versions.v2,
-    blurb: "A Connecticut backyard — warm, inviting, feels like home.",
-    swatches: ["#3d2b22", "#a9743f", "#d8c1ad", "#f3ead9"],
+    blurb: "Powder blue & gold — warm, inviting, romantic.",
+    swatches: ["#9fb8d0", "#f3ecdc", "#c8a23a", "#ffffff", "#7c8d60"],
     tone: "from-v2-espresso/75 to-v2-espresso/20",
   },
   {
     cfg: versions.v3,
-    blurb: "New England floral — simple, elegant, in full bloom.",
-    swatches: ["#33475b", "#5f7fa6", "#8ba4c9", "#dde7f2"],
+    blurb: "Powder blue & gold — soft, elegant, in full bloom.",
+    swatches: ["#9fb8d0", "#f3ecdc", "#c8a23a", "#ffffff", "#7c8d60"],
     tone: "from-v3-ink/70 to-v3-ink/20",
   },
 ];

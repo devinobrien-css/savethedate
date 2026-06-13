@@ -1,12 +1,15 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 import {
   checkPassword,
   createAdminSession,
   destroyAdminSession,
   isAdminPasswordConfigured,
+  isAuthed,
 } from "@/lib/auth";
+import { getSupabase, isSupabaseConfigured, RSVP_TABLE } from "@/lib/supabase";
 
 export type LoginState = { error?: string };
 
@@ -28,4 +31,22 @@ export async function login(
 export async function logout(): Promise<void> {
   await destroyAdminSession();
   redirect("/admin");
+}
+
+export async function deleteRsvp(formData: FormData): Promise<void> {
+  // Guard: only an authenticated admin may delete.
+  if (!(await isAuthed())) {
+    redirect("/admin");
+  }
+  if (!isSupabaseConfigured()) return;
+
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = getSupabase();
+  const { error } = await supabase.from(RSVP_TABLE).delete().eq("id", id);
+  if (error) {
+    console.error("RSVP delete failed:", error.message);
+  }
+  revalidatePath("/admin");
 }
