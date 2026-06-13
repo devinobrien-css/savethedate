@@ -1,0 +1,15 @@
+# Netlify build config for this Next.js (App Router) app.
+# This is a server-rendered app — API routes (/api/rsvp, /api/admin, /api/calendar)
+# and server components need the Next.js runtime, provided by the plugin below.
+# NOTE: any Base/Build/Publish/Functions overrides set in the Netlify dashboard
+# take precedence over this file — clear them so these values are used.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
