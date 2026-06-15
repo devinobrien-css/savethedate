@@ -5,7 +5,8 @@ import {
   Jost,
   Tangerine,
 } from "next/font/google";
-import { wedding } from "@/config/site";
+import { wedding, enabledNavLinks } from "@/config/site";
+import BottomNav, { type BottomNavItem } from "@/components/BottomNav";
 import "./globals.css";
 
 const cormorant = Cormorant_Garamond({
@@ -73,12 +74,27 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Bottom nav: Home plus every enabled directory link, resolved server-side so
+  // the flag/env logic stays in one place.
+  const bottomNavItems: BottomNavItem[] = [
+    { label: "Home", href: "/", icon: "home" },
+    ...enabledNavLinks().map((l) => ({
+      label: l.short ?? l.label,
+      href: l.href,
+      icon: l.icon ?? ("calendar" as const),
+    })),
+  ];
+
   return (
     <html
       lang="en"
       className={`${cormorant.variable} ${playfair.variable} ${jost.variable} ${tangerine.variable}`}
     >
-      <body>{children}</body>
+      {/* Pad the page bottom so the fixed nav bar never covers content. */}
+      <body className="pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
+        {children}
+        <BottomNav items={bottomNavItems} />
+      </body>
     </html>
   );
 }

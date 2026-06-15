@@ -1,25 +1,14 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { wedding, navLinks } from "@/config/site";
+import { wedding, enabledNavLinks } from "@/config/site";
 
 export const metadata: Metadata = {
   title: `${wedding.partnerA} & ${wedding.partnerB} — Wedding`,
   description: `${wedding.weddingDateLabel} · ${wedding.city}`,
 };
 
-// A directory is enabled unless its flag env var is explicitly "false".
-function enabled(flag: string): boolean {
-  return process.env[flag] !== "false";
-}
-function resolveHref(link: { href: string; hrefEnv?: string }): string {
-  if (link.hrefEnv && process.env[link.hrefEnv]) return process.env[link.hrefEnv] as string;
-  return link.href;
-}
-
 export default function Home() {
-  const links = navLinks
-    .filter((l) => enabled(l.flag))
-    .map((l) => ({ ...l, href: resolveHref(l) }));
+  const links = enabledNavLinks();
 
   return (
     <main className="flex min-h-[100svh] flex-col items-center justify-center overflow-x-hidden bg-v1-paper px-6 py-20 font-sans text-v1-ink">

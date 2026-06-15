@@ -263,6 +263,10 @@ export type NavLink = {
   flag: string;
   /** Optional env var holding an external URL that overrides href when set. */
   hrefEnv?: string;
+  /** Short label for the compact bottom nav bar. Falls back to `label`. */
+  short?: string;
+  /** Icon key used by the bottom nav bar (see BottomNav). */
+  icon?: "calendar" | "map" | "attire" | "rsvp" | "gift";
 };
 
 export const navLinks: NavLink[] = [
@@ -271,29 +275,60 @@ export const navLinks: NavLink[] = [
     caption: "Our date & story",
     href: "/save-the-date",
     flag: "NAV_SAVE_THE_DATE",
+    short: "Date",
+    icon: "calendar",
   },
   {
     label: "Location & Time",
     caption: "Where & when we'll celebrate",
     href: "/location",
     flag: "NAV_LOCATION_TIME",
+    short: "Location",
+    icon: "map",
   },
   {
     label: "Dress Code",
     caption: "What to wear",
     href: "/dress-code",
     flag: "NAV_DRESS_CODE",
+    short: "Attire",
+    icon: "attire",
+  },
+  {
+    label: "RSVP",
+    caption: "Let us know you're coming",
+    href: "/rsvp",
+    flag: "NAV_RSVP",
+    short: "RSVP",
+    icon: "rsvp",
   },
   {
     label: "Registry & Gifts",
     caption: "Your presence is the present",
     href: "/registry",
     flag: "NAV_REGISTRY",
+    short: "Gifts",
+    icon: "gift",
     // If REGISTRY_URL is set it overrides the in-app /registry page (e.g. to
     // point at an external registry instead). Leave unset to use our own page.
     hrefEnv: "REGISTRY_URL",
   },
 ];
+
+/**
+ * Server-only nav resolution shared by the home directory (/) and the bottom
+ * nav bar. A link is shown unless its flag env var is exactly "false"; an
+ * optional hrefEnv overrides the href when set. Reads process.env, so call
+ * this from server components only.
+ */
+export function enabledNavLinks(): NavLink[] {
+  return navLinks
+    .filter((l) => process.env[l.flag] !== "false")
+    .map((l) => ({
+      ...l,
+      href: l.hrefEnv && process.env[l.hrefEnv] ? (process.env[l.hrefEnv] as string) : l.href,
+    }));
+}
 
 /**
  * Cash-gift options shown as a section on the registry page. No payment is
