@@ -34,9 +34,9 @@ const themes: Record<
   v1: {
     field:
       "border border-v1-mist bg-white focus:border-v1-denim focus:ring-v1-denim/25 rounded-none text-v1-ink placeholder:text-v1-sky/70",
-    label: "text-v1-denim uppercase tracking-widest2 text-xs font-sans",
+    label: "text-v1-denim uppercase tracking-[0.18em] sm:tracking-widest2 text-xs font-sans",
     button:
-      "bg-v1-blush text-v1-ink hover:bg-v1-ink hover:text-v1-blush tracking-widest2 uppercase text-sm rounded-none",
+      "bg-v1-blush text-v1-ink hover:bg-v1-ink hover:text-v1-blush tracking-[0.2em] sm:tracking-widest2 uppercase text-sm rounded-none",
     radioActive: "bg-v1-ink text-white border-v1-ink",
     radioIdle: "border-v1-mist text-v1-denim hover:border-v1-denim",
     success: "text-v1-navy",
@@ -44,7 +44,7 @@ const themes: Record<
   v2: {
     field:
       "border border-v2-taupe bg-v2-linen focus:border-v2-caramel focus:ring-v2-caramel/30 rounded-lg text-v2-espresso placeholder:text-v2-walnut/50",
-    label: "text-v2-walnut uppercase tracking-[0.22em] text-xs font-sans",
+    label: "text-v2-walnut uppercase tracking-[0.15em] sm:tracking-[0.22em] text-xs font-sans",
     button:
       "bg-v2-terracotta text-v2-espresso hover:bg-v2-espresso hover:text-v2-terracotta tracking-[0.18em] uppercase text-sm rounded-lg",
     radioActive: "bg-v2-walnut text-v2-linen border-v2-walnut",
@@ -54,7 +54,7 @@ const themes: Record<
   v3: {
     field:
       "border-0 border-b border-v3-powder bg-transparent focus:border-v3-delft focus:ring-0 rounded-none text-v3-ink placeholder:text-v3-periwinkle/60 px-0",
-    label: "text-v3-delft uppercase tracking-[0.28em] text-xs font-sans",
+    label: "text-v3-delft uppercase tracking-[0.16em] sm:tracking-[0.28em] text-xs font-sans",
     button:
       "bg-v3-periwinkle text-v3-ink hover:bg-v3-ink hover:text-v3-periwinkle tracking-[0.22em] uppercase text-sm rounded-full",
     radioActive: "bg-v3-delft text-white border-v3-delft",
@@ -201,6 +201,29 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
       </div>
 
       <div>
+        <label className={`block mb-2 ${t.label}`}>Mobile phone (optional)</label>
+        <input
+          name="phone"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
+          placeholder="(555) 123-4567"
+          className={`${inputBase} ${t.field}`}
+        />
+        <label className="mt-3 flex items-start gap-2.5 cursor-pointer">
+          <input
+            name="smsOptIn"
+            type="checkbox"
+            className="mt-0.5 h-4 w-4 flex-none accent-current"
+          />
+          <span className="font-sans text-xs opacity-70 leading-relaxed">
+            Text me occasional updates about the wedding (schedule, directions,
+            reminders). We&apos;ll only use it for that.
+          </span>
+        </label>
+      </div>
+
+      <div>
         <label className={`block mb-3 ${t.label}`}>Will you join us?</label>
         <div className="flex gap-3">
           {(["yes", "no"] as const).map((opt) => (
@@ -208,7 +231,7 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
               type="button"
               key={opt}
               onClick={() => setAttending(opt)}
-              className={`flex-1 py-3 border font-sans text-sm tracking-wide transition-colors ${
+              className={`flex flex-1 items-center justify-center text-center min-h-[3.25rem] px-2 py-3 border font-sans text-sm leading-tight tracking-wide transition-colors ${
                 attending === opt ? t.radioActive : t.radioIdle
               } ${variant === "v2" ? "rounded-lg" : variant === "v3" ? "rounded-full" : "rounded-none"}`}
             >

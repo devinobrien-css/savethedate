@@ -23,6 +23,72 @@ body {
   transform: translateY(0);
 }
 
+/* ── Leaflet map (Location & Time page) ─────────────────────────────── */
+.leaflet-container {
+  background: #f3ecdc; /* v1 paper, shows while tiles load */
+  font-family: inherit;
+}
+/* Soften the bright OSM tiles to sit with the ivory palette */
+.leaflet-tile-pane {
+  filter: saturate(0.78) contrast(0.96) brightness(1.02);
+}
+.lm-divicon {
+  background: none;
+  border: none;
+}
+.lm-pin {
+  position: relative;
+  width: 30px;
+  height: 40px;
+}
+.lm-teardrop {
+  filter: drop-shadow(0 4px 6px rgba(30, 42, 58, 0.25));
+  transition: transform 0.15s ease;
+}
+/* Tappable pins (those that open a maps app) get a pointer + lift on hover */
+.lm-clickable {
+  cursor: pointer;
+}
+.lm-clickable:hover .lm-teardrop {
+  transform: translateY(-2px) scale(1.06);
+}
+.lm-label {
+  position: absolute;
+  left: 38px;
+  top: 4px;
+  display: flex;
+  flex-direction: column;
+  white-space: nowrap;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #fffdf7;
+  border: 1px solid rgba(30, 42, 58, 0.12);
+  box-shadow: 0 6px 16px -10px rgba(30, 42, 58, 0.5);
+  line-height: 1.25;
+}
+.lm-label--left {
+  left: auto;
+  right: 38px;
+  align-items: flex-end;
+  text-align: right;
+}
+.lm-label strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e2a3a;
+}
+.lm-label em {
+  font-style: normal;
+  font-size: 10px;
+  letter-spacing: 0.02em;
+  color: #5e7896;
+}
+/* Tidy the zoom control to match */
+.leaflet-bar a {
+  color: #2d4258;
+  border-color: rgba(30, 42, 58, 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

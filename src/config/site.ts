@@ -52,7 +52,7 @@ export const wedding: WeddingDetails = {
   partnerB: "Rebecca",
   weddingDateISO: "2027-07-17T16:00:00",
   weddingDateLabel: "July 17, 2027",
-  dateStylized: "7 • 17 • 27",
+  dateStylized: "7.17.27",
   ceremonyTime: "Time to be announced",
   durationHours: 6,
   venueName: "The Penn Club",
@@ -67,6 +67,188 @@ export const wedding: WeddingDetails = {
   rsvpByLabel: "Kindly respond by June 1, 2027",
   dressCode: "Cocktail",
   dressCodeNote: "City-chic, evening elegant",
+};
+
+/**
+ * The order of events on the wedding day — drives the timeline on the
+ * Location & Time page. Kept here so the whole schedule edits in one place.
+ */
+import type { ScheduleIconName } from "@/components/ScheduleIcon";
+
+export type ScheduleStop = {
+  /** Time label, e.g. "3:00 PM". Empty string if not yet set. */
+  time: string;
+  /** What's happening, e.g. "Ceremony". */
+  title: string;
+  /** Where / supporting line. Empty string to omit. */
+  detail: string;
+  /** Which line-art icon to draw on the rail. */
+  icon: ScheduleIconName;
+  /** Travel legs (shuttles) render lighter, as connectors rather than stops. */
+  transit?: boolean;
+  /** Renders a "day break" divider above this stop (e.g. "The Next Morning"). */
+  dayLabel?: string;
+};
+
+export const daySchedule: ScheduleStop[] = [
+  {
+    time: "Time TBA",
+    title: "Gather at The Penn Club",
+    detail: "30 West 44th Street — where the day begins.",
+    icon: "toast",
+  },
+  {
+    time: "",
+    title: "Shuttle to the ceremony",
+    detail: "Buses take us from The Penn Club to the church.",
+    icon: "bus",
+    transit: true,
+  },
+  {
+    time: "3:00 PM",
+    title: "Ceremony",
+    detail: "At the church — location to be announced.",
+    icon: "rings",
+  },
+  {
+    time: "",
+    title: "Shuttle back to The Penn Club",
+    detail: "Buses return us for the reception.",
+    icon: "bus",
+    transit: true,
+  },
+  {
+    time: "6:00 PM",
+    title: "Cocktail Hour",
+    detail: "The Penn Club.",
+    icon: "martini",
+  },
+  {
+    time: "7:00 PM",
+    title: "Dinner",
+    detail: "The Penn Club.",
+    icon: "utensils",
+  },
+  {
+    time: "After dinner",
+    title: "Music & Dancing",
+    detail: "Stay late and celebrate with us.",
+    icon: "music",
+  },
+  {
+    time: "Time TBA",
+    title: "Farewell Brunch",
+    detail: "A relaxed send-off before you head home — details to come.",
+    icon: "coffee",
+    dayLabel: "The Next Morning",
+  },
+];
+
+/**
+ * One-line summary shown under the date on the Location & Time page — the
+ * essentials in a single scan. The timeline below is the full detail.
+ */
+export const locationSummary =
+  "Ceremony 3 PM · Reception at The Penn Club · shuttles provided";
+
+/**
+ * Pins for the map on the Location & Time page. The church is a placeholder
+ * until the venue is confirmed — update its lat/lng (or set show:false) then.
+ */
+export type MapPinKind = "venue" | "tentative" | "landmark";
+
+export type MapPin = {
+  lat: number;
+  lng: number;
+  label: string;
+  /** Optional second line in the marker label. */
+  sublabel?: string;
+  kind: MapPinKind;
+  /** Which side the label chip sits on. Defaults to "right". */
+  labelDir?: "left" | "right";
+  /**
+   * Search string used when the pin is tapped to open a maps app. Set this to
+   * make the pin clickable; omit (e.g. tentative church) to leave it inert.
+   * Falls back to the pin's lat/lng inside that handler if needed.
+   */
+  mapsQuery?: string;
+  /** Set false to hide the pin (e.g. church not yet known). */
+  show?: boolean;
+};
+
+export const mapPins: MapPin[] = [
+  {
+    lat: 40.75565,
+    lng: -73.9803,
+    label: "The Penn Club",
+    sublabel: "30 West 44th Street",
+    kind: "venue",
+    labelDir: "left", // sits close to Grand Central — push label the other way
+    mapsQuery: "The Penn Club, 30 West 44th Street, New York, NY",
+  },
+  {
+    // Placeholder in the East 80s (Upper East Side) — replace with the real
+    // church when confirmed. Around East 81st St & Park Ave.
+    lat: 40.7768,
+    lng: -73.9575,
+    label: "Ceremony",
+    sublabel: "Church · East 80s, TBA",
+    kind: "tentative",
+  },
+  {
+    lat: 40.75273,
+    lng: -73.97715,
+    label: "Grand Central Terminal",
+    sublabel: "≈ 5 min walk away",
+    kind: "landmark",
+    mapsQuery: "Grand Central Terminal, New York, NY",
+  },
+];
+
+/**
+ * Travel & lodging recommendations shown at the bottom of the Location & Time
+ * page. App links live here so they're easy to update.
+ */
+export const recommendationsIntro = "Arrive early, stay late!";
+
+export type Recommendation = {
+  icon: ScheduleIconName;
+  title: string;
+  body: string;
+  /** Optional app / website callout link. */
+  linkLabel?: string;
+  linkHref?: string;
+  /** Optional emphasized practical note. */
+  note?: string;
+};
+
+export const travelRecs: Recommendation[] = [
+  {
+    icon: "train",
+    title: "Take the train — our top pick",
+    body: "The Penn Club is about a five-minute walk from Grand Central Terminal, so the train is by far the easiest way in and out of the city.",
+    linkLabel: "MTA TrainTime app",
+    linkHref: "https://new.mta.info",
+    note: "Check schedules and buy tickets right in the app. After 11 PM, trains generally run on the hour, every hour.",
+  },
+  {
+    icon: "car",
+    title: "Braving the drive?",
+    body: "You have our blessing — just plan for city traffic and limited parking.",
+    linkLabel: "SpotAngels app",
+    linkHref: "https://www.spotangels.com",
+    note: "Handy for finding garages and parking near The Penn Club.",
+  },
+];
+
+/**
+ * Overnight stay note. Hidden unless RECOMMEND_LODGING="true" — often shown
+ * to family only. The page reads that env flag.
+ */
+export const lodgingRec: Recommendation = {
+  icon: "moon",
+  title: "Staying overnight",
+  body: "Overnight accommodations at The Penn Club may be available by request. Reach out to us and we'll help arrange it.",
 };
 
 /**
@@ -105,11 +287,41 @@ export const navLinks: NavLink[] = [
   {
     label: "Registry & Gifts",
     caption: "Your presence is the present",
-    href: "#",
+    href: "/registry",
     flag: "NAV_REGISTRY",
+    // If REGISTRY_URL is set it overrides the in-app /registry page (e.g. to
+    // point at an external registry instead). Leave unset to use our own page.
     hrefEnv: "REGISTRY_URL",
   },
 ];
+
+/**
+ * Cash-gift options shown as a section on the registry page. No payment is
+ * processed on-site — these are simply the ways guests can give directly.
+ */
+export type GiftOptions = {
+  /** Master toggle for the whole "prefer to give a gift" section. */
+  show: boolean;
+  heading: string;
+  note: string;
+  /** Venmo username without the leading "@" (e.g. "devin-obrien"). */
+  venmoHandle?: string;
+  /** A short line about check / cash (e.g. "Find us at the reception"). */
+  checkCashNote?: string;
+};
+
+export const gifts: GiftOptions = {
+  show: true,
+  heading: "Prefer to give a gift?",
+  note: "Your presence is the greatest gift — but if you'd like to give something toward our next chapter, we're grateful for any of the below.",
+  venmoHandle: "",
+  checkCashNote: "Checks or cash are warmly welcomed — find us at the reception, or reach out and we'll share a mailing address.",
+};
+
+/** venmo.com profile link for the configured handle, or null if unset. */
+export function venmoUrl(): string | null {
+  return gifts.venmoHandle ? `https://venmo.com/u/${gifts.venmoHandle}` : null;
+}
 
 /** All curated proposal photos (portrait, golden hour). */
 export const galleryPhotos = [
@@ -144,8 +356,8 @@ export const versions: Record<"v1" | "v2" | "v3", VersionConfig> = {
     slug: "version-1",
     name: "Modern New York",
     tagline: "Sleek. City light. Unforgettable.",
-    hero: "/photos/IMG_6786.JPG",
-    accentImage: "/photos/IMG_6820.JPG",
+    hero: "/photos/IMG_6817.JPG",
+    accentImage: "/photos/IMG_6788.JPG",
     flags: { hero: true, countdown: true, gallery: true, ceremony: true, details: true, rsvp: true },
   },
   v2: {

@@ -1,6 +1,8 @@
 import "server-only";
 import { Resend } from "resend";
 import { buildRsvpConfirmation, type Variant } from "@/emails/rsvpConfirmation";
+import { buildRegistryClaim } from "@/emails/registryClaim";
+import { logEmail } from "@/lib/emailLog";
 
 /**
  * Transactional email via Resend. Configured lazily so a missing API key
@@ -28,10 +30,21 @@ export async function sendRsvpConfirmation(input: {
   partySize: number;
   variant?: Variant;
 }): Promise<void> {
-  if (!isEmailConfigured()) return;
+  const { subject } = buildRsvpConfirmation(input);
 
-  const { subject, html, text } = buildRsvpConfirmation(input);
-  const { error } = await client().emails.send({
+  if (!isEmailConfigured()) {
+    await logEmail({
+      type: "rsvp_confirmation",
+      recipient: input.to,
+      subject,
+      status: "skipped",
+      error: "Email is not configured (RESEND_API_KEY / RESEND_FROM).",
+    });
+    return;
+  }
+
+  const { html, text } = buildRsvpConfirmation(input);
+  const { data, error } = await client().emails.send({
     from: process.env.RESEND_FROM!,
     to: input.to,
     subject,
@@ -39,7 +52,74 @@ export async function sendRsvpConfirmation(input: {
     text,
   });
   if (error) {
+    await logEmail({
+      type: "rsvp_confirmation",
+      recipient: input.to,
+      subject,
+      status: "failed",
+      error: error.message,
+    });
     // Throw so the caller can log it; the RSVP itself still succeeds.
     throw new Error(error.message);
   }
+  await logEmail({
+    type: "rsvp_confirmation",
+    recipient: input.to,
+    subject,
+    status: "sent",
+    providerId: data?.id ?? null,
+  });
+}
+
+/**
+ * "Confirm your gift" verification email for a registry claim. Unlike the RSVP
+ * confirmation, this one is load-bearing — the claim stays `pending` until the
+ * guest clicks the confirm link — so the caller should surface failures (and
+ * not pretend the claim is locked in if we couldn't reach them).
+ */
+export async function sendRegistryClaimVerification(input: {
+  to: string;
+  name: string;
+  itemTitle: string;
+  confirmUrl: string;
+  releaseUrl: string;
+}): Promise<void> {
+  const { subject } = buildRegistryClaim(input);
+
+  if (!isEmailConfigured()) {
+    await logEmail({
+      type: "registry_claim",
+      recipient: input.to,
+      subject,
+      status: "skipped",
+      error: "Email is not configured (RESEND_API_KEY / RESEND_FROM).",
+    });
+    throw new Error("Email is not configured (set RESEND_API_KEY and RESEND_FROM).");
+  }
+
+  const { html, text } = buildRegistryClaim(input);
+  const { data, error } = await client().emails.send({
+    from: process.env.RESEND_FROM!,
+    to: input.to,
+    subject,
+    html,
+    text,
+  });
+  if (error) {
+    await logEmail({
+      type: "registry_claim",
+      recipient: input.to,
+      subject,
+      status: "failed",
+      error: error.message,
+    });
+    throw new Error(error.message);
+  }
+  await logEmail({
+    type: "registry_claim",
+    recipient: input.to,
+    subject,
+    status: "sent",
+    providerId: data?.id ?? null,
+  });
 }

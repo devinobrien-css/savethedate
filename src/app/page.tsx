@@ -22,18 +22,18 @@ export default function Home() {
     .map((l) => ({ ...l, href: resolveHref(l) }));
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-v1-paper px-6 py-20 font-sans text-v1-ink">
-      <header className="text-center">
-        <h1 className="mt-6 font-display text-5xl sm:text-6xl leading-[1.05]">
+    <main className="flex min-h-[100svh] flex-col items-center justify-center overflow-x-hidden bg-v1-paper px-6 py-20 font-sans text-v1-ink">
+      <header className="w-full max-w-md text-center">
+        <h1 className="mt-6 font-display leading-[1.05] text-[clamp(2.25rem,11vw,3.75rem)]">
           {wedding.partnerA}
-          <span className="mx-3 font-script text-v1-blush">&amp;</span>
+          <span className="mx-2 sm:mx-3 font-script text-v1-blush">&amp;</span>
           {wedding.partnerB}
         </h1>
-        <p className="text-[11px] uppercase tracking-widest2 text-v1-denim">
+        <p className="mt-2 text-[11px] uppercase tracking-[0.2em] sm:tracking-widest2 text-v1-denim">
           Are getting married
         </p>
         <div className="mx-auto mt-6 h-px w-14 bg-v1-blush" />
-        <p className="mt-6 text-[11px] uppercase tracking-widest2 text-v1-denim">
+        <p className="mt-6 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] sm:tracking-widest2 text-v1-denim">
           {wedding.weddingDateLabel} · {wedding.city}
         </p>
       </header>

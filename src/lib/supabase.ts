@@ -16,6 +16,9 @@ export type RSVP = {
   attending: boolean;
   party_size: number;
   note: string | null;
+  phone: string | null;
+  sms_opt_in: boolean;
+  sms_opted_out: boolean;
 };
 
 export function isSupabaseConfigured(): boolean {

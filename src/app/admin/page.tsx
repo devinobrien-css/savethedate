@@ -9,7 +9,7 @@ import {
 import { wedding } from "@/config/site";
 import LoginForm from "./LoginForm";
 import DeleteRsvpButton from "./DeleteRsvpButton";
-import { logout } from "./actions";
+import AdminHeader from "./AdminHeader";
 
 export const metadata: Metadata = {
   title: "RSVP Admin",
@@ -54,14 +54,13 @@ export default async function AdminPage() {
   if (!isSupabaseConfigured()) {
     return (
       <Shell>
-        <div className="mx-auto max-w-2xl px-6 py-20">
-          <h1 className="mb-4 font-serif text-3xl">RSVP Dashboard</h1>
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <AdminHeader active="rsvp" />
           <p className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
             Supabase isn&apos;t configured. Set <code>SUPABASE_URL</code> and{" "}
             <code>SUPABASE_SERVICE_ROLE_KEY</code> (see <code>.env.example</code>),
             then create the <code>rsvps</code> table from <code>supabase/schema.sql</code>.
           </p>
-          <LogoutButton />
         </div>
       </Shell>
     );
@@ -81,23 +80,17 @@ export default async function AdminPage() {
   return (
     <Shell>
       <div className="mx-auto max-w-5xl px-6 py-12">
-        <header className="mb-10 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-[0.35em] text-neutral-500">
-              {wedding.partnerA} &amp; {wedding.partnerB} · {wedding.weddingDateLabel}
-            </p>
-            <h1 className="mt-2 font-serif text-3xl">RSVP Dashboard</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <a
-              href="/api/admin/export"
-              className="rounded-lg border border-neutral-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-neutral-200 transition-colors hover:bg-neutral-800"
-            >
-              Export CSV
-            </a>
-            <LogoutButton />
-          </div>
-        </header>
+        <AdminHeader active="rsvp" />
+
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="font-serif text-2xl">RSVP List</h1>
+          <a
+            href="/api/admin/export"
+            className="rounded-lg border border-neutral-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-neutral-200 transition-colors hover:bg-neutral-800"
+          >
+            Export CSV
+          </a>
+        </div>
 
         {error && (
           <p className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
@@ -188,18 +181,5 @@ function Stat({ label, value }: { label: string; value: number }) {
         {label}
       </p>
     </div>
-  );
-}
-
-function LogoutButton() {
-  return (
-    <form action={logout}>
-      <button
-        type="submit"
-        className="rounded-lg border border-neutral-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-neutral-200 transition-colors hover:bg-neutral-800"
-      >
-        Sign out
-      </button>
-    </form>
   );
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSupabase, isSupabaseConfigured, RSVP_TABLE } from "@/lib/supabase";
 import { sendRsvpConfirmation } from "@/lib/email";
+import { toE164 } from "@/lib/phone";
 import type { Variant } from "@/emails/rsvpConfirmation";
 
 export const runtime = "nodejs";
@@ -29,6 +30,10 @@ export async function POST(request: Request) {
   const email = str(data.get("email")).toLowerCase();
   const attendingRaw = str(data.get("attending"));
   const note = str(data.get("note"));
+  // Phone is optional and only kept when it parses to a US E.164 number. SMS
+  // opt-in is meaningful only with a usable number; a bad/blank phone clears it.
+  const phone = toE164(str(data.get("phone")));
+  const smsOptIn = str(data.get("smsOptIn")) === "on" && phone !== null;
   const partySize = Math.max(0, Math.min(20, parseInt(str(data.get("guests")) || "0", 10) || 0));
   const variantRaw = str(data.get("variant"));
   const variant: Variant | undefined =
@@ -60,6 +65,8 @@ export async function POST(request: Request) {
         attending,
         party_size: attending ? Math.max(1, partySize) : 0,
         note: note || null,
+        phone,
+        sms_opt_in: smsOptIn,
       },
       { onConflict: "email" }
     );

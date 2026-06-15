@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { Metadata } from "next";
 import { wedding, versions, galleryPhotos } from "@/config/site";
 import Reveal from "@/components/Reveal";
@@ -116,26 +115,30 @@ export default function VersionOne() {
       )}
 
       {/* ───────────── SPLIT / ACCENT ───────────── */}
-      <section className="grid lg:grid-cols-2 items-stretch bg-v1-paper">
-        <Reveal className="relative min-h-[420px] lg:min-h-[640px]">
+      <section className="flex flex-col lg:flex-row items-stretch bg-v1-paper">
+        <Reveal className="relative w-full aspect-[1366/2048] lg:aspect-auto lg:w-[560px] lg:h-[640px] lg:shrink-0">
           <Image
             src={v.accentImage}
             alt="The proposal"
             fill
-            sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-cover object-[50%_40%]"
+            sizes="(max-width: 1024px) 100vw, 40vw"
+            className="object-cover object-center"
           />
         </Reveal>
-        <Reveal className="flex items-center bg-v1-navy text-v1-paper px-8 sm:px-16 py-20">
-          <div className="max-w-md">
+        <Reveal className="flex flex-1 items-center justify-center bg-v1-navy text-v1-paper px-8 sm:px-16 py-20">
+          <div className="max-w-lg">
             <p className="text-[11px] uppercase tracking-widest2 text-v1-mist">Our story</p>
-            <h3 className="mt-5 font-display text-4xl sm:text-5xl leading-tight">
+            <div className="mt-4 h-px w-12 bg-v1-mist/50" />
+            <h3 className="mt-6 font-display text-4xl sm:text-5xl leading-tight">
               From a city morning to forever.
             </h3>
-            <p className="mt-6 text-base leading-relaxed text-v1-paper/80 font-sans">
-              Beneath the skyline and the park&apos;s first golden light, one
+            <p className="mt-7 text-lg leading-loose text-v1-paper/80 font-sans">
+              Beneath the skyline and the sun&apos;s golden light, one
               question changed everything. Now we&apos;re turning that moment into
               a lifetime — and we want you in the room when we do.
+            </p>
+            <p className="mt-8 text-[11px] uppercase tracking-widest2 text-v1-mist">
+              {wedding.proposalPlace}
             </p>
           </div>
         </Reveal>
@@ -232,12 +235,6 @@ export default function VersionOne() {
         <p className="mt-4 text-[11px] uppercase tracking-widest2">
           {wedding.weddingDateLabel} · {wedding.city}
         </p>
-        <Link
-          href="/"
-          className="mt-8 inline-block text-[11px] uppercase tracking-widest2 text-v1-sky hover:text-v1-paper transition-colors"
-        >
-          ← All designs
-        </Link>
       </footer>
     </main>
   );
