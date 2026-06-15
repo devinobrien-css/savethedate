@@ -1,0 +1,16 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <!-- D & R monogram — gilded gold on deep navy, matching the wedding palette -->
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e4c66b"/>
+      <stop offset="1" stop-color="#c8a23a"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#1e2a3a"/>
+  <rect x="3.5" y="3.5" width="57" height="57" rx="11" fill="none" stroke="url(#gold)" stroke-width="1.25" stroke-opacity="0.55"/>
+  <text x="32" y="33" text-anchor="middle" dominant-baseline="central"
+        font-family="Georgia, 'Times New Roman', 'Playfair Display', serif"
+        font-size="27" font-style="italic" letter-spacing="0.5" fill="url(#gold)">
+    <tspan>D</tspan><tspan font-size="17" dy="-0.5" baseline-shift="2"> &amp; </tspan><tspan font-size="27">R</tspan>
+  </text>
+</svg>
