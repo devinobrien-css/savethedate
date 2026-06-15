@@ -8,7 +8,7 @@ import AdminHeader from "../AdminHeader";
 import SmsComposer from "./SmsComposer";
 
 export const metadata: Metadata = {
-  title: "SMS",
+  title: "Devin & Rebecca's Wedding",
   robots: { index: false, follow: false },
 };
 
