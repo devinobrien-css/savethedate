@@ -1,18 +1,25 @@
 import type { Metadata } from "next";
 import { wedding } from "@/config/site";
 import InfoPage from "@/components/InfoPage";
+import PaletteExamples from "@/components/PaletteExamples";
 
 export const metadata: Metadata = {
   title: `Dress Code — ${wedding.partnerA} & ${wedding.partnerB}`,
   description: `${wedding.dressCode} · ${wedding.dressCodeNote}`,
 };
 
-// Palette inspiration shown to guests (matches the site's Powder Blue scheme).
+// Palette inspiration shown to guests. Ivory is reserved for the bride and
+// powder blue for the bridesmaids, so neither appears here.
 const palette = [
-  { name: "Powder Blue", hex: "#9fb8d0" },
-  { name: "Ivory", hex: "#f3ecdc" },
+  { name: "Navy", hex: "#2c3e57" },
+  { name: "Denim", hex: "#4a6b8a" },
+  { name: "Sage", hex: "#7c8d60" },
+  { name: "Emerald", hex: "#1f6b54" },
   { name: "Gold", hex: "#c8a23a" },
-  { name: "Greenery", hex: "#7c8d60" },
+  { name: "Terracotta", hex: "#bf6a4a" },
+  { name: "Dusty Rose", hex: "#c89aa0" },
+  { name: "Plum", hex: "#6b4a6b" },
+  { name: "Charcoal", hex: "#3a3a40" },
 ];
 
 export default function DressCodePage() {
@@ -45,7 +52,10 @@ export default function DressCodePage() {
             </div>
           ))}
         </div>
-        <p className="mt-6 text-xs text-v1-denim/70">
+
+        <PaletteExamples />
+
+        <p className="mt-8 text-xs text-v1-denim/70">
           Inspiration only — wear whatever makes you feel wonderful.
         </p>
       </div>
