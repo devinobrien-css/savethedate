@@ -84,18 +84,34 @@ export default function RegistryCatalog({ items }: { items: RegistryCardItem[] }
             >
               Sort by
             </label>
-            <select
-              id="registry-sort"
-              value={sort}
-              onChange={(e) => setSort(e.target.value as SortKey)}
-              className="border border-v1-ink/15 bg-white px-3 py-1.5 text-[11px] uppercase tracking-widest2 text-v1-denim outline-none transition-colors duration-300 hover:border-v1-blush/70 focus:border-v1-blush"
-            >
-              {SORTS.map((opt) => (
-                <option key={opt.key} value={opt.key}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="registry-sort"
+                value={sort}
+                onChange={(e) => setSort(e.target.value as SortKey)}
+                className="appearance-none rounded-none border border-v1-ink/15 bg-white py-1.5 pl-3 pr-9 text-[11px] uppercase tracking-widest2 text-v1-denim outline-none transition-colors duration-300 hover:border-v1-blush/70 focus:border-v1-blush"
+              >
+                {SORTS.map((opt) => (
+                  <option key={opt.key} value={opt.key}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-v1-denim/60"
+              >
+                <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden>
+                  <path
+                    d="M2.5 4.5 6 8l3.5-3.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+            </div>
           </div>
         </div>
       </div>

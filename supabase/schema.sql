@@ -34,19 +34,24 @@ alter table public.rsvps add column if not exists sms_opted_out boolean not null
 
 
 -- ─────────────────────────────────────────────────────────────────────────
---  GUESTS / ADDRESS BOOK — the mailing list the couple curates by hand
---  (names + addresses for save-the-dates and invitations), managed from
---  /admin/guests. Submitted RSVPs are linked back to a guest via rsvps.guest_id
---  so a response can be matched to the address it came from.
+--  PARTIES & GUESTS / ADDRESS BOOK — the mailing list the couple curates by
+--  hand, managed from /admin/guests. The mailing unit is the *party* (one
+--  envelope: a household label + a single address). Each party contains one or
+--  more *guests* (the named people). Submitted RSVPs are linked back to an
+--  individual guest via rsvps.guest_id so a response can be matched to a person
+--  and, through them, to the address it came from.
+--
+--  NOTE: a party owns the address; a guest owns only person-level fields. If
+--  you have an existing database from before this split (guests carried their
+--  own address columns), run supabase/migrations/0001_parties.sql to migrate.
 -- ─────────────────────────────────────────────────────────────────────────
 
-create table if not exists public.guests (
+-- A party = one envelope. The household label + address that a save-the-date
+-- or invitation is mailed to.
+create table if not exists public.parties (
   id              uuid primary key default gen_random_uuid(),
   created_at      timestamptz not null default now(),
   updated_at      timestamptz not null default now(),
-  first_name      text not null,
-  last_name       text,
-  email           text,                 -- used to auto-suggest RSVP matches
   household_label text,                  -- e.g. "The Smith Family" (mailing name)
   address_line1   text,
   address_line2   text,
@@ -54,23 +59,41 @@ create table if not exists public.guests (
   state           text,
   postal_code     text,
   country         text not null default 'USA',
-  notes           text
+  notes           text                   -- household-level note (e.g. "RSVP'd by phone")
+);
+
+-- The named people. Each belongs to exactly one party; deleting a party
+-- removes its guests (their RSVPs survive — see rsvps.guest_id below).
+create table if not exists public.guests (
+  id              uuid primary key default gen_random_uuid(),
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+  party_id        uuid references public.parties(id) on delete cascade,
+  first_name      text not null,
+  last_name       text,
+  email           text,                 -- used to auto-suggest RSVP matches
+  notes           text                  -- person-level note (e.g. dietary, plus-one)
 );
 
 -- Same posture as the other tables: RLS on, no public policies. All access is
 -- server-side via the service-role key.
-alter table public.guests enable row level security;
+alter table public.parties enable row level security;
+alter table public.guests  enable row level security;
 
-create index if not exists guests_name_idx on public.guests (last_name, first_name);
-create index if not exists guests_email_idx on public.guests (email);
+create index if not exists guests_name_idx     on public.guests (last_name, first_name);
+create index if not exists guests_email_idx    on public.guests (email);
+create index if not exists guests_party_id_idx  on public.guests (party_id);
+create index if not exists parties_name_idx     on public.parties (household_label);
 
--- Link a submitted RSVP to a curated guest record. ON DELETE SET NULL so
--- removing an address book entry simply unlinks its RSVPs (it never deletes a
--- guest's actual response). The RSVP upsert (by email) doesn't touch this
--- column, so a guest editing their reply keeps their link.
-alter table public.rsvps add column if not exists guest_id uuid
-  references public.guests(id) on delete set null;
-create index if not exists rsvps_guest_id_idx on public.rsvps (guest_id);
+-- Link a submitted RSVP to a party (the household it belongs to). One person
+-- replies for the whole party — party_size carries the headcount — so the
+-- response attaches to the group, not an individual. ON DELETE SET NULL so
+-- deleting a party simply unlinks its RSVPs (it never deletes a guest's actual
+-- response). The RSVP upsert (by email) doesn't touch this column, so a guest
+-- editing their reply keeps their link.
+alter table public.rsvps add column if not exists party_id uuid
+  references public.parties(id) on delete set null;
+create index if not exists rsvps_party_id_idx on public.rsvps (party_id);
 
 
 -- ─────────────────────────────────────────────────────────────────────────
