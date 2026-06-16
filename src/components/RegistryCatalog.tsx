@@ -112,11 +112,25 @@ export default function RegistryCatalog({ items }: { items: RegistryCardItem[] }
               <span className="text-[11px] uppercase tracking-widest2 text-v1-denim">
                 {group.label} <span className="text-v1-denim/50">({group.items.length})</span>
               </span>
-              <span
-                aria-hidden
-                className="text-v1-denim transition-transform duration-300 group-open:rotate-180"
-              >
-                ↓
+              <span className="flex items-center gap-2 text-[11px] uppercase tracking-widest2 text-v1-denim/60 transition-colors duration-300 group-hover:text-v1-denim">
+                <span className="hidden sm:inline">
+                  <span className="group-open:hidden">Show</span>
+                  <span className="hidden group-open:inline">Hide</span>
+                </span>
+                <span
+                  aria-hidden
+                  className="flex h-6 w-6 items-center justify-center rounded-full border border-v1-ink/20 transition-[transform,border-color] duration-300 group-hover:border-v1-blush group-open:rotate-180"
+                >
+                  <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden>
+                    <path
+                      d="M2.5 4.5 6 8l3.5-3.5"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </span>
               </span>
             </summary>
             <div className="grid gap-6 pb-8 pt-2 sm:grid-cols-2 lg:grid-cols-3">
