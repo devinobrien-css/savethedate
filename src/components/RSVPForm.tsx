@@ -210,13 +210,14 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
           placeholder="(555) 123-4567"
           className={`${inputBase} ${t.field}`}
         />
-        <label className="mt-3 flex items-start gap-2.5 cursor-pointer">
+        <label className="mt-2.5 flex items-start gap-2 cursor-pointer">
           <input
             name="smsOptIn"
             type="checkbox"
-            className="mt-0.5 h-4 w-4 flex-none accent-current"
+            defaultChecked
+            className="mt-px h-3.5 w-3.5 flex-none accent-current opacity-60"
           />
-          <span className="font-sans text-xs opacity-70 leading-relaxed">
+          <span className="font-sans text-[11px] opacity-50 leading-relaxed">
             Text me occasional updates about the wedding (schedule, directions,
             reminders). We&apos;ll only use it for that.
           </span>

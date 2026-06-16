@@ -12,6 +12,7 @@ import { logEmail } from "@/lib/emailLog";
  * Env:
  *   RESEND_API_KEY  — from resend.com/api-keys
  *   RESEND_FROM     — verified sender, e.g. "Devin & Rebecca <rsvp@yourdomain.com>"
+ *   REPLY_TO        — optional monitored reply address; defaults to RESEND_FROM's address
  */
 export function isEmailConfigured(): boolean {
   return Boolean(process.env.RESEND_API_KEY && process.env.RESEND_FROM);
@@ -21,6 +22,29 @@ let cached: Resend | null = null;
 function client(): Resend {
   if (!cached) cached = new Resend(process.env.RESEND_API_KEY!);
   return cached;
+}
+
+/** Extract the bare address from a "Name <addr@x>" or "addr@x" sender string. */
+function fromAddress(): string {
+  const from = process.env.RESEND_FROM ?? "";
+  const match = from.match(/<([^>]+)>/);
+  return (match ? match[1] : from).trim();
+}
+
+/**
+ * Deliverability headers shared by every send. A monitored Reply-To and a
+ * List-Unsubscribe header both improve inbox placement under Gmail/Yahoo's
+ * bulk-sender rules. The unsubscribe is a mailto (no endpoint needed) — these
+ * are transactional confirmations, so it's a courtesy signal, not a list opt-out.
+ */
+function deliverability(): { replyTo: string; headers: Record<string, string> } {
+  const replyTo = process.env.REPLY_TO?.trim() || fromAddress();
+  return {
+    replyTo,
+    headers: {
+      "List-Unsubscribe": `<mailto:${replyTo}?subject=unsubscribe>`,
+    },
+  };
 }
 
 export async function sendRsvpConfirmation(input: {
@@ -50,6 +74,7 @@ export async function sendRsvpConfirmation(input: {
     subject,
     html,
     text,
+    ...deliverability(),
   });
   if (error) {
     await logEmail({
@@ -104,6 +129,7 @@ export async function sendRegistryClaimVerification(input: {
     subject,
     html,
     text,
+    ...deliverability(),
   });
   if (error) {
     await logEmail({

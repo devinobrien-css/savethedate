@@ -6,11 +6,13 @@ export type RegistryCardItem = {
   id: string;
   title: string;
   description: string | null;
+  priceCents: number | null;
   priceLabel: string | null;
   storeName: string | null;
   productUrl: string | null;
   imageUrl: string | null;
   claimed: boolean;
+  mostWanted: boolean;
 };
 
 type Status = "idle" | "form" | "submitting" | "success" | "error";
@@ -47,13 +49,18 @@ export default function RegistryCard({ item }: { item: RegistryCardItem }) {
   const covered = item.claimed;
 
   return (
-    <div className="flex flex-col border border-v1-ink/15 bg-white">
+    <div className="relative flex flex-col border border-v1-ink/15 bg-white">
+      {item.mostWanted && (
+        <span className="absolute left-3 top-3 z-10 bg-v1-blush px-2.5 py-1 text-[10px] uppercase tracking-widest2 text-v1-ink">
+          ♥ Most wanted
+        </span>
+      )}
       {item.imageUrl && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={item.imageUrl}
           alt=""
-          className={`aspect-[4/3] w-full object-cover ${covered ? "opacity-50 grayscale" : ""}`}
+          className={`aspect-[4/3] w-full bg-white object-contain p-4 ${covered ? "opacity-50 grayscale" : ""}`}
         />
       )}
 
@@ -129,6 +136,12 @@ export default function RegistryCard({ item }: { item: RegistryCardItem }) {
               type="email"
               placeholder="you@example.com"
               className="w-full border border-v1-mist bg-white px-3 py-2.5 text-sm text-v1-ink outline-none focus:border-v1-denim"
+            />
+            <textarea
+              name="note"
+              rows={2}
+              placeholder="Add a note for the couple (optional)"
+              className="w-full resize-none border border-v1-mist bg-white px-3 py-2.5 text-sm text-v1-ink outline-none focus:border-v1-denim"
             />
             {status === "error" && (
               <p className="text-sm text-red-600/90" role="alert">

@@ -19,6 +19,9 @@ export const REGISTRY_CLAIMS_TABLE = "registry_claims";
 
 export type ClaimStatus = "pending" | "confirmed" | "released";
 
+/** `gift` = a normal claimable item; `fund` = a "contribute cash toward" card. */
+export type RegistryKind = "gift" | "fund";
+
 export type RegistryItem = {
   id: string;
   created_at: string;
@@ -30,6 +33,8 @@ export type RegistryItem = {
   image_url: string | null;
   sort_order: number;
   is_active: boolean;
+  kind: RegistryKind;
+  is_most_wanted: boolean;
 };
 
 export type RegistryClaim = {
@@ -41,6 +46,7 @@ export type RegistryClaim = {
   status: ClaimStatus;
   confirmed_at: string | null;
   released_at: string | null;
+  note: string | null;
 };
 
 /** A claim still holding an item (pending verification or fully confirmed). */

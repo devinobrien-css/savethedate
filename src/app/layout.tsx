@@ -90,8 +90,10 @@ export default function RootLayout({
       lang="en"
       className={`${cormorant.variable} ${playfair.variable} ${jost.variable} ${tangerine.variable}`}
     >
-      {/* Pad the page bottom so the fixed nav bar never covers content. */}
-      <body className="pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
+      {/* Pad the page bottom so the fixed nav bar never covers content. The
+          paper background fills that reserved band so no white line shows
+          beneath the page when scrolled to the bottom. */}
+      <body className="bg-v1-paper pb-[calc(4.25rem+env(safe-area-inset-bottom))]">
         {children}
         <BottomNav items={bottomNavItems} />
       </body>

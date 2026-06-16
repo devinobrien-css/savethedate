@@ -19,6 +19,8 @@ export type RSVP = {
   phone: string | null;
   sms_opt_in: boolean;
   sms_opted_out: boolean;
+  // Set from /admin/guests when an RSVP is matched to an address book entry.
+  guest_id: string | null;
 };
 
 export function isSupabaseConfigured(): boolean {

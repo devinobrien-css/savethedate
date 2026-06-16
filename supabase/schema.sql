@@ -34,6 +34,46 @@ alter table public.rsvps add column if not exists sms_opted_out boolean not null
 
 
 -- ─────────────────────────────────────────────────────────────────────────
+--  GUESTS / ADDRESS BOOK — the mailing list the couple curates by hand
+--  (names + addresses for save-the-dates and invitations), managed from
+--  /admin/guests. Submitted RSVPs are linked back to a guest via rsvps.guest_id
+--  so a response can be matched to the address it came from.
+-- ─────────────────────────────────────────────────────────────────────────
+
+create table if not exists public.guests (
+  id              uuid primary key default gen_random_uuid(),
+  created_at      timestamptz not null default now(),
+  updated_at      timestamptz not null default now(),
+  first_name      text not null,
+  last_name       text,
+  email           text,                 -- used to auto-suggest RSVP matches
+  household_label text,                  -- e.g. "The Smith Family" (mailing name)
+  address_line1   text,
+  address_line2   text,
+  city            text,
+  state           text,
+  postal_code     text,
+  country         text not null default 'USA',
+  notes           text
+);
+
+-- Same posture as the other tables: RLS on, no public policies. All access is
+-- server-side via the service-role key.
+alter table public.guests enable row level security;
+
+create index if not exists guests_name_idx on public.guests (last_name, first_name);
+create index if not exists guests_email_idx on public.guests (email);
+
+-- Link a submitted RSVP to a curated guest record. ON DELETE SET NULL so
+-- removing an address book entry simply unlinks its RSVPs (it never deletes a
+-- guest's actual response). The RSVP upsert (by email) doesn't touch this
+-- column, so a guest editing their reply keeps their link.
+alter table public.rsvps add column if not exists guest_id uuid
+  references public.guests(id) on delete set null;
+create index if not exists rsvps_guest_id_idx on public.rsvps (guest_id);
+
+
+-- ─────────────────────────────────────────────────────────────────────────
 --  REGISTRY — the gift catalog (managed from /admin/registry) and the
 --  email-verified "mark as purchased" claims guests leave on /registry.
 -- ─────────────────────────────────────────────────────────────────────────
@@ -52,6 +92,14 @@ create table if not exists public.registry_items (
   is_active    boolean not null default true
 );
 
+-- `gift`  → a normal registry item (price band + email-verified claim flow).
+-- `fund`  → a "contribute cash toward" card: a sweet description of something
+--           guests can put cash/check toward. No price, no claim — purely a
+--           prompt for what a money gift goes to. `is_most_wanted` surfaces a
+--           ❤ badge and an optional sort on the public page.
+alter table public.registry_items add column if not exists kind text not null default 'gift';
+alter table public.registry_items add column if not exists is_most_wanted boolean not null default false;
+
 -- Mark-as-purchased claims. A claim is created `pending` and becomes
 -- `confirmed` once the guest clicks the verification link we email them;
 -- `released` frees the item again (guest changed their mind, or admin reset).
@@ -65,6 +113,10 @@ create table if not exists public.registry_claims (
   confirmed_at  timestamptz,
   released_at   timestamptz
 );
+
+-- Optional note the gifter leaves with their claim (e.g. "Can't wait to
+-- celebrate!"). Shown to the couple in the admin registry view.
+alter table public.registry_claims add column if not exists note text;
 
 -- Same posture as rsvps: RLS on, no public policies. All access is server-side
 -- via the service-role key, so the public anon key can neither read nor write.

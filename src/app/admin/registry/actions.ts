@@ -49,6 +49,8 @@ type ItemFields = {
   image_url: string | null;
   sort_order: number;
   is_active: boolean;
+  kind: "gift" | "fund";
+  is_most_wanted: boolean;
 };
 
 function readItemFields(formData: FormData): ItemFields | null {
@@ -65,34 +67,52 @@ function readItemFields(formData: FormData): ItemFields | null {
     sort_order: Number.isFinite(sortRaw) ? sortRaw : 0,
     // Unchecked checkboxes submit nothing, so absence means inactive.
     is_active: str(formData.get("is_active")) === "on",
+    kind: str(formData.get("kind")) === "fund" ? "fund" : "gift",
+    is_most_wanted: str(formData.get("is_most_wanted")) === "on",
   };
 }
 
-export async function createItem(formData: FormData): Promise<void> {
-  if (!(await guard())) return;
+/** Result of a save, so the admin form can show why a write didn't stick. */
+export type ItemActionResult = { ok: true } | { ok: false; error: string };
+
+const NOT_CONFIGURED: ItemActionResult = {
+  ok: false,
+  error: "Supabase isn't configured, so changes can't be saved.",
+};
+
+export async function createItem(formData: FormData): Promise<ItemActionResult> {
+  if (!(await guard())) return NOT_CONFIGURED;
   const fields = readItemFields(formData);
-  if (!fields) return; // title is required
+  if (!fields) return { ok: false, error: "A title is required." };
 
   const supabase = getSupabase();
   const { error } = await supabase.from(REGISTRY_ITEMS_TABLE).insert(fields);
-  if (error) console.error("Registry item create failed:", error.message);
+  if (error) {
+    console.error("Registry item create failed:", error.message);
+    return { ok: false, error: error.message };
+  }
   revalidateRegistry();
+  return { ok: true };
 }
 
-export async function updateItem(formData: FormData): Promise<void> {
-  if (!(await guard())) return;
+export async function updateItem(formData: FormData): Promise<ItemActionResult> {
+  if (!(await guard())) return NOT_CONFIGURED;
   const id = str(formData.get("id"));
-  if (!id) return;
+  if (!id) return { ok: false, error: "Missing the item to update." };
   const fields = readItemFields(formData);
-  if (!fields) return;
+  if (!fields) return { ok: false, error: "A title is required." };
 
   const supabase = getSupabase();
   const { error } = await supabase
     .from(REGISTRY_ITEMS_TABLE)
     .update(fields)
     .eq("id", id);
-  if (error) console.error("Registry item update failed:", error.message);
+  if (error) {
+    console.error("Registry item update failed:", error.message);
+    return { ok: false, error: error.message };
+  }
   revalidateRegistry();
+  return { ok: true };
 }
 
 export async function deleteItem(formData: FormData): Promise<void> {

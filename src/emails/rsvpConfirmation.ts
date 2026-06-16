@@ -54,7 +54,7 @@ export function buildRsvpConfirmation(input: RsvpConfirmationInput): EmailConten
     : `Thank you for letting us know, ${firstName}`;
 
   const intro = attending
-    ? "We're so happy you'll be joining us — your response is confirmed. Here's everything we have on file:"
+    ? "We're so happy you'll be joining us — your response is confirmed!"
     : "Thank you for letting us know. We'll truly miss you, but we're so grateful you replied. Here's what we have on file:";
 
   const responseLabel = attending ? "Joyfully accepts" : "Regretfully declines";

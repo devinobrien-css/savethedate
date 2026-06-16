@@ -55,8 +55,10 @@ export default async function RegistryAdminPage() {
     loadError = e instanceof Error ? e.message : "Failed to load registry.";
   }
 
-  const covered = items.filter((i) => i.claim).length;
-  const open = items.filter((i) => i.is_active && !i.claim).length;
+  // Stats track claimable gifts only — cash funds have no claim flow.
+  const giftItems = items.filter((i) => i.kind !== "fund");
+  const covered = giftItems.filter((i) => i.claim).length;
+  const open = giftItems.filter((i) => i.is_active && !i.claim).length;
 
   return (
     <Shell>
@@ -72,7 +74,7 @@ export default async function RegistryAdminPage() {
         )}
 
         <section className="mb-10 grid grid-cols-3 gap-4">
-          <Stat label="Gifts" value={items.length} />
+          <Stat label="Gifts" value={giftItems.length} />
           <Stat label="Covered" value={covered} />
           <Stat label="Open" value={open} />
         </section>
@@ -124,11 +126,18 @@ function ItemRow({ item }: { item: AdminRegistryItem }) {
           className="h-14 w-14 flex-none rounded-md object-cover opacity-90"
         />
         <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {item.is_most_wanted && <span title="Most wanted" className="text-v1-blush">♥</span>}
             <span className="truncate font-medium text-neutral-100">{item.title}</span>
-            <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${status.cls}`}>
-              {status.label}
-            </span>
+            {item.kind === "fund" ? (
+              <span className="rounded-full bg-sky-500/15 px-2.5 py-0.5 text-[11px] font-medium text-sky-300">
+                Cash fund
+              </span>
+            ) : (
+              <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${status.cls}`}>
+                {status.label}
+              </span>
+            )}
           </div>
           <p className="mt-0.5 truncate text-xs text-neutral-500">
             {[item.store_name, price].filter(Boolean).join(" · ") || "—"}
@@ -139,6 +148,9 @@ function ItemRow({ item }: { item: AdminRegistryItem }) {
               <span className="text-neutral-200">{claim.claimer_name}</span>{" "}
               <span className="text-neutral-500">({claim.claimer_email})</span>
             </p>
+          )}
+          {claim?.note && (
+            <p className="mt-1 text-xs italic text-neutral-400">“{claim.note}”</p>
           )}
         </div>
         <div className="flex items-center gap-2">

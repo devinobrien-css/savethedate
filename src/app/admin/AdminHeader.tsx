@@ -9,6 +9,7 @@ import { logout } from "./actions";
  */
 const TABS = [
   { id: "rsvp", label: "RSVP List", href: "/admin" },
+  { id: "guests", label: "Guests", href: "/admin/guests" },
   { id: "registry", label: "Registry", href: "/admin/registry" },
   { id: "emails", label: "Emails", href: "/admin/emails" },
   { id: "sms", label: "SMS", href: "/admin/sms" },

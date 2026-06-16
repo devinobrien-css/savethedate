@@ -42,6 +42,8 @@ export async function POST(request: Request) {
   const itemId = str(data.get("itemId"));
   const name = str(data.get("name"));
   const email = str(data.get("email")).toLowerCase();
+  // Optional note from the gifter; cap it so the column can't be abused.
+  const note = str(data.get("note")).slice(0, 500) || null;
 
   if (!itemId) {
     return NextResponse.json({ error: "Missing the gift." }, { status: 400 });
@@ -76,7 +78,7 @@ export async function POST(request: Request) {
   // hits a unique violation here, which we translate into a friendly 409.
   const { data: claimRow, error: claimErr } = await supabase
     .from(REGISTRY_CLAIMS_TABLE)
-    .insert({ item_id: item.id, claimer_name: name, claimer_email: email })
+    .insert({ item_id: item.id, claimer_name: name, claimer_email: email, note })
     .select("id")
     .single();
 
