@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { wedding } from "@/config/site";
+import { wedding, shippingAddressLines } from "@/config/site";
 import InfoPage from "@/components/InfoPage";
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
@@ -73,12 +73,35 @@ export default async function ConfirmPage({
   const outcome = await confirm(token);
 
   if (outcome.kind === "ok") {
+    const shipTo = shippingAddressLines();
     return (
       <InfoPage eyebrow="Registry & Gifts" title="Thank you — it's confirmed">
         <p className="text-sm leading-relaxed text-v1-denim/80">
           You're giving <span className="font-medium text-v1-ink">{outcome.itemTitle}</span>.
           We've marked it as covered so no one else doubles up. It means so much to us.
         </p>
+        {shipTo ? (
+          <div className="mt-8 border-t border-v1-ink/10 pt-6">
+            <p className="text-[11px] uppercase tracking-widest2 text-v1-denim">
+              Where to ship it
+            </p>
+            <address className="mt-3 text-sm not-italic leading-relaxed text-v1-ink">
+              {shipTo.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
+            </address>
+            <p className="mt-3 text-xs leading-relaxed text-v1-denim/70">
+              No rush — we&apos;ve also included this in your confirmation email.
+            </p>
+          </div>
+        ) : (
+          <p className="mt-6 text-sm leading-relaxed text-v1-denim/80">
+            Need a mailing address to send it? Just reply to your confirmation
+            email and we&apos;ll share one.
+          </p>
+        )}
         <p className="mt-8 text-[11px] uppercase tracking-widest2 text-v1-denim">
           With love · {wedding.partnerA} &amp; {wedding.partnerB}
         </p>

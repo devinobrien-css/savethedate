@@ -1,4 +1,4 @@
-import { wedding } from "@/config/site";
+import { wedding, shippingAddressLines } from "@/config/site";
 
 /**
  * "Confirm your gift" verification email — sent when a guest marks a registry
@@ -41,6 +41,7 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
   const item = escapeHtml(input.itemTitle);
   const couple = `${wedding.partnerA} & ${wedding.partnerB}`;
   const divider = "rgba(0,0,0,0.07)";
+  const shipTo = shippingAddressLines();
 
   const subject = `Confirm your gift — ${input.itemTitle}`;
   const preheader = `One click to confirm you're giving "${input.itemTitle}".`;
@@ -93,6 +94,17 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:34px;">
                 <tr><td align="center" style="padding-bottom:12px;">${btn(confirmUrl, "Confirm this gift", true)}</td></tr>
               </table>
+              ${
+                shipTo
+                  ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px;background:${p.tint};border-radius:14px;">
+                <tr><td style="padding:20px 26px;">
+                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:${p.ink};opacity:0.5;">Where to ship it</div>
+                  <div style="font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.55;color:${p.ink};margin-top:8px;">${shipTo.map((l) => escapeHtml(l)).join("<br>")}</div>
+                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:${p.ink};opacity:0.6;margin-top:12px;">No rush at all — whenever the gift ships is perfect.</div>
+                </td></tr>
+              </table>`
+                  : ""
+              }
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px;">
                 <tr><td style="border-top:1px solid ${divider};font-size:0;line-height:0;height:1px;">&nbsp;</td></tr>
                 <tr><td align="center" style="padding-top:26px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:${p.ink};opacity:0.7;">
@@ -132,6 +144,9 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
     "",
     `Confirm this gift: ${confirmUrl}`,
     "",
+    ...(shipTo
+      ? ["Where to ship it (no rush):", ...shipTo, ""]
+      : []),
     `Changed your mind? Release it so someone else can give it: ${releaseUrl}`,
     "",
     `With love and gratitude, ${couple}`,

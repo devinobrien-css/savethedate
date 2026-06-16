@@ -358,6 +358,21 @@ export function venmoUrl(): string | null {
   return gifts.venmoHandle ? `https://venmo.com/u/${gifts.venmoHandle}` : null;
 }
 
+/**
+ * Shipping address for physical gifts, read from the SHIPPING_ADDRESS env var
+ * so a home address never lives in this public repo. Separate lines with "|",
+ * e.g. SHIPPING_ADDRESS="Devin & Rebecca|306 Example St|City, ST 00000".
+ * Returns the trimmed lines, or null if unset — callers fall back to the
+ * "reach out and we'll share a mailing address" note. Server-only (reads
+ * process.env), and only ever surfaced after a guest confirms a gift.
+ */
+export function shippingAddressLines(): string[] | null {
+  const raw = process.env.SHIPPING_ADDRESS?.trim();
+  if (!raw) return null;
+  const lines = raw.split("|").map((l) => l.trim()).filter(Boolean);
+  return lines.length ? lines : null;
+}
+
 /** All curated proposal photos (portrait, golden hour). */
 export const galleryPhotos = [
   "/photos/IMG_6786.JPG",
