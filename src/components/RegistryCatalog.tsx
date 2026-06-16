@@ -26,7 +26,7 @@ const PRICE_BANDS: { key: string; label: string; match: (cents: number | null) =
 ];
 
 export default function RegistryCatalog({ items }: { items: RegistryCardItem[] }) {
-  const [sort, setSort] = useState<SortKey>("featured");
+  const [sort, setSort] = useState<SortKey>("price-asc");
   const [query, setQuery] = useState("");
   const [hideClaimed, setHideClaimed] = useState(false);
 
