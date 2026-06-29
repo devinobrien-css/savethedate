@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { PartyWithGuests } from "@/lib/guests";
 import { createParty, updateParty } from "./actions";
-import { Field, input } from "./formFields";
+import { ActionForm, Field, input, SubmitButton } from "./formFields";
 
 /**
  * Party (envelope) form. Two modes:
@@ -19,13 +18,12 @@ export default function PartyForm({
   mode: "create" | "edit";
   party?: PartyWithGuests;
 }) {
-  const [pending, setPending] = useState(false);
   const action = mode === "create" ? createParty : updateParty;
 
   return (
-    <form
+    <ActionForm
       action={action}
-      onSubmit={() => setPending(true)}
+      resetOnSuccess={mode === "create"}
       className="grid gap-4 sm:grid-cols-2"
     >
       {mode === "edit" && <input type="hidden" name="id" value={party!.id} />}
@@ -95,14 +93,12 @@ export default function PartyForm({
       </Field>
 
       <div className="sm:col-span-2">
-        <button
-          type="submit"
-          disabled={pending}
+        <SubmitButton
+          idle={mode === "create" ? "Add party" : "Save address"}
+          busy="Saving…"
           className="rounded-lg bg-neutral-100 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-neutral-900 transition-colors hover:bg-white disabled:opacity-50"
-        >
-          {pending ? "Saving…" : mode === "create" ? "Add party" : "Save address"}
-        </button>
+        />
       </div>
-    </form>
+    </ActionForm>
   );
 }

@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import type { Guest } from "@/lib/guests";
 import { addGuest, updateGuest } from "./actions";
-import { Field, input } from "./formFields";
+import { ActionForm, Field, input, SubmitButton } from "./formFields";
 
 /**
  * Person (guest) form. Two modes:
@@ -22,13 +21,12 @@ export default function PersonForm({
   guest?: Guest;
   compact?: boolean;
 }) {
-  const [pending, setPending] = useState(false);
   const action = mode === "add" ? addGuest : updateGuest;
 
   return (
-    <form
+    <ActionForm
       action={action}
-      onSubmit={() => setPending(true)}
+      resetOnSuccess={mode === "add"}
       className="grid gap-3 sm:grid-cols-2"
     >
       {mode === "add" && <input type="hidden" name="party_id" value={partyId} />}
@@ -51,18 +49,16 @@ export default function PersonForm({
       </Field>
 
       <div className="sm:col-span-2">
-        <button
-          type="submit"
-          disabled={pending}
+        <SubmitButton
+          idle={mode === "add" ? "Add person" : "Save changes"}
+          busy="Saving…"
           className={
             compact
               ? "rounded-lg border border-neutral-700 px-4 py-2 text-[11px] font-medium uppercase tracking-[0.2em] text-neutral-200 transition-colors hover:bg-neutral-800 disabled:opacity-50"
               : "rounded-lg bg-neutral-100 px-5 py-2.5 text-xs font-medium uppercase tracking-[0.2em] text-neutral-900 transition-colors hover:bg-white disabled:opacity-50"
           }
-        >
-          {pending ? "Saving…" : mode === "add" ? "Add person" : "Save changes"}
-        </button>
+        />
       </div>
-    </form>
+    </ActionForm>
   );
 }
