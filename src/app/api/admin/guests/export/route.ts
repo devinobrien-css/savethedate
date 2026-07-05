@@ -14,14 +14,16 @@ function csvCell(value: unknown): string {
 }
 
 /**
- * Zip cell that survives spreadsheet apps. Excel/Sheets read a bare "07001" as
- * the number 7001 and drop the leading zero, so for US-style zips we emit an
- * ="07001" formula that forces a text cell. Non-US postal codes (which contain
- * letters/spaces and aren't coerced) pass through as-is.
+ * Zip cell as plain text. The CSV is imported into Zola, whose parser reads an
+ * ="07001" text-guard formula literally (leaving a stray "="), so we keep zips
+ * plain. A bare US zip that lost its leading zero somewhere upstream (stored as
+ * "6897") is left-padded back to 5 digits; anything else passes through as-is.
+ * Note: opening this file directly in Excel/Sheets will still drop the leading
+ * zero on display — import it into Zola rather than eyeballing it in a spreadsheet.
  */
 function zipCell(value: string): string {
   const s = value.trim();
-  if (/^\d{5}(-\d{4})?$/.test(s)) return csvCell(`="${s}"`);
+  if (/^\d{1,4}$/.test(s)) return csvCell(s.padStart(5, "0"));
   return csvCell(s);
 }
 
