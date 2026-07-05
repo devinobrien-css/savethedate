@@ -14,6 +14,18 @@ function csvCell(value: unknown): string {
 }
 
 /**
+ * Zip cell that survives spreadsheet apps. Excel/Sheets read a bare "07001" as
+ * the number 7001 and drop the leading zero, so for US-style zips we emit an
+ * ="07001" formula that forces a text cell. Non-US postal codes (which contain
+ * letters/spaces and aren't coerced) pass through as-is.
+ */
+function zipCell(value: string): string {
+  const s = value.trim();
+  if (/^\d{5}(-\d{4})?$/.test(s)) return csvCell(`="${s}"`);
+  return csvCell(s);
+}
+
+/**
  * Export the address book as a "guest list" CSV — one row per party
  * (household), matching the common import template: the first person is the
  * named guest, everyone else in the party is a plus-one / family member on the
@@ -57,7 +69,7 @@ export async function GET() {
         csvCell(street),
         csvCell(p.city ?? ""),
         csvCell(p.state ?? ""),
-        csvCell(p.postal_code ?? ""),
+        zipCell(p.postal_code ?? ""),
       ].join(",")
     );
   }
