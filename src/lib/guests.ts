@@ -114,6 +114,47 @@ export function partyOptionLabel(p: PartyWithGuests): string {
   return partyLabel(p);
 }
 
+/** One row of the guest-list CSV export (one mailing line per party). */
+export type GuestExportRow = {
+  fullName: string;
+  plusOne: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+};
+
+export const GUEST_EXPORT_HEADERS = [
+  "Full Name",
+  "Plus one or Y/N",
+  "Street Address",
+  "City",
+  "State",
+  "Zip",
+] as const;
+
+/** Left-pad a bare US zip that lost its leading zero (e.g. "6897") back to 5. */
+function normalizeZip(v: string | null): string {
+  const s = (v ?? "").trim();
+  return /^\d{1,4}$/.test(s) ? s.padStart(5, "0") : s;
+}
+
+/**
+ * The rows behind the guest-list export, shared by the CSV route and the admin
+ * preview so both show exactly the same data. One recipient line per party: the
+ * mailing/envelope name as the full name, plus-one left blank.
+ */
+export function guestExportRows(parties: PartyWithGuests[]): GuestExportRow[] {
+  return parties.map((p) => ({
+    fullName: partyLabel(p),
+    plusOne: "",
+    street: [p.address_line1, p.address_line2].filter(Boolean).join(", "),
+    city: p.city ?? "",
+    state: p.state ?? "",
+    zip: normalizeZip(p.postal_code),
+  }));
+}
+
 /**
  * Load the whole address book in one pass: every party with the people in it
  * and the RSVPs linked to the household, plus the RSVPs that aren't linked yet

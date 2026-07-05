@@ -1,37 +1,26 @@
 import { NextResponse } from "next/server";
 import { isAuthed } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
-import { getAddressBook, partyLabel } from "@/lib/guests";
+import {
+  getAddressBook,
+  guestExportRows,
+  GUEST_EXPORT_HEADERS,
+} from "@/lib/guests";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+// Always wrap in quotes (and escape inner quotes). Every field is emitted as a
+// quoted string so the zip is a quoted "06897" rather than a bare number.
 function csvCell(value: unknown): string {
   const s = value == null ? "" : String(value);
-  // Escape quotes; wrap in quotes if it contains comma/quote/newline.
-  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
-  return s;
+  return `"${s.replaceAll('"', '""')}"`;
 }
 
 /**
- * Zip cell as plain text. The CSV is imported into Zola, whose parser reads an
- * ="07001" text-guard formula literally (leaving a stray "="), so we keep zips
- * plain. A bare US zip that lost its leading zero somewhere upstream (stored as
- * "6897") is left-padded back to 5 digits; anything else passes through as-is.
- * Note: opening this file directly in Excel/Sheets will still drop the leading
- * zero on display — import it into Zola rather than eyeballing it in a spreadsheet.
- */
-function zipCell(value: string): string {
-  const s = value.trim();
-  if (/^\d{1,4}$/.test(s)) return csvCell(s.padStart(5, "0"));
-  return csvCell(s);
-}
-
-/**
- * Export the address book as a "guest list" CSV — one row per party
- * (household), matching the common import template: the first person is the
- * named guest, everyone else in the party is a plus-one / family member on the
- * same line, and the party's mailing address is split into columns.
+ * Export the address book as a "guest list" CSV — one mailing line per party
+ * (household): the envelope/household name as the full name, the plus-one
+ * column left blank, and the party's mailing address split into columns.
  */
 export async function GET() {
   if (!(await isAuthed())) {
@@ -49,29 +38,12 @@ export async function GET() {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 
-  const header = [
-    "Full Name",
-    "Plus one or Y/N",
-    "Street Address",
-    "City",
-    "State",
-    "Zip",
-  ];
-  const lines = [header.join(",")];
-  for (const p of parties) {
-    // Use the party's mailing/envelope name as the full name, and leave the
-    // plus-one column blank (one recipient line per household).
-    const fullName = partyLabel(p);
-    const street = [p.address_line1, p.address_line2].filter(Boolean).join(", ");
+  const lines = [GUEST_EXPORT_HEADERS.map(csvCell).join(",")];
+  for (const r of guestExportRows(parties)) {
     lines.push(
-      [
-        csvCell(fullName),
-        csvCell(""),
-        csvCell(street),
-        csvCell(p.city ?? ""),
-        csvCell(p.state ?? ""),
-        zipCell(p.postal_code ?? ""),
-      ].join(",")
+      [r.fullName, r.plusOne, r.street, r.city, r.state, r.zip]
+        .map(csvCell)
+        .join(",")
     );
   }
 

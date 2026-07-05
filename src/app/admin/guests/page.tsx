@@ -6,6 +6,8 @@ import {
   getAddressBook,
   formatAddress,
   guestName,
+  guestExportRows,
+  GUEST_EXPORT_HEADERS,
   partyOptionLabel,
   hasAddress,
   partyLabel,
@@ -100,6 +102,51 @@ export default async function GuestsAdminPage() {
             Couldn&apos;t load the address book: {loadError}
           </p>
         )}
+
+        {/* Preview the export exactly as it will be written — HTML, so leading
+            zeros on zips survive (Excel would strip them on a plain open). */}
+        <details className="mb-10 rounded-lg border border-neutral-800 bg-neutral-900/60">
+          <summary className="cursor-pointer list-none px-5 py-4 text-sm font-medium uppercase tracking-[0.2em] text-neutral-300 marker:hidden">
+            Preview export ({parties.length})
+          </summary>
+          <div className="border-t border-neutral-800 p-5">
+            <p className="mb-4 text-xs text-neutral-500">
+              Exactly what “Export CSV” writes, one row per party. Verify zips
+              here — the file keeps its leading zeros; opening the CSV in
+              Excel/Sheets is what strips them, so upload the download straight
+              to Zola.
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left text-xs">
+                <thead>
+                  <tr className="border-b border-neutral-800 text-neutral-400">
+                    {GUEST_EXPORT_HEADERS.map((h) => (
+                      <th key={h} className="whitespace-nowrap px-3 py-2 font-medium">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {guestExportRows(parties).map((r, i) => (
+                    <tr key={i} className="border-b border-neutral-900 text-neutral-300">
+                      <td className="whitespace-nowrap px-3 py-2">{r.fullName}</td>
+                      <td className="whitespace-nowrap px-3 py-2 text-neutral-600">
+                        {r.plusOne || "—"}
+                      </td>
+                      <td className="whitespace-nowrap px-3 py-2">{r.street || "—"}</td>
+                      <td className="whitespace-nowrap px-3 py-2">{r.city || "—"}</td>
+                      <td className="whitespace-nowrap px-3 py-2">{r.state || "—"}</td>
+                      <td className="whitespace-nowrap px-3 py-2 tabular-nums">
+                        {r.zip || "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
 
         <section className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-5">
           <Stat label="Parties" value={parties.length} />
