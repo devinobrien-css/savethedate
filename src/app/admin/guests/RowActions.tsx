@@ -1,7 +1,33 @@
 "use client";
 
 import { useState } from "react";
-import { deleteParty, deleteGuest, unlinkRsvp } from "./actions";
+import { deleteParty, deleteGuest, moveGuest, unlinkRsvp } from "./actions";
+
+/** Up/down arrow to reorder a person within their party. */
+export function MoveGuestButton({
+  id,
+  dir,
+  disabled,
+}: {
+  id: string;
+  dir: "up" | "down";
+  disabled: boolean;
+}) {
+  return (
+    <form action={moveGuest}>
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="dir" value={dir} />
+      <button
+        type="submit"
+        disabled={disabled}
+        className="rounded-md border border-neutral-700 px-2 py-0.5 text-xs leading-none text-neutral-400 transition-colors hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-30"
+        aria-label={dir === "up" ? "Move up" : "Move down"}
+      >
+        {dir === "up" ? "↑" : "↓"}
+      </button>
+    </form>
+  );
+}
 
 /** Delete a whole party — household + everyone in it (their RSVPs are kept). */
 export function DeletePartyButton({ id, label }: { id: string; label: string }) {

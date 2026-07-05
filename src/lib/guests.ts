@@ -44,6 +44,7 @@ export type Guest = {
   last_name: string | null;
   email: string | null;
   notes: string | null;
+  sort_order: number;
 };
 
 /** A party plus the people in it and the RSVPs linked to the household. */
@@ -130,6 +131,7 @@ export async function getAddressBook(): Promise<AddressBook> {
     supabase
       .from(GUESTS_TABLE)
       .select("*")
+      .order("sort_order", { ascending: true })
       .order("last_name", { ascending: true })
       .order("first_name", { ascending: true }),
     supabase

@@ -152,7 +152,7 @@ export async function deleteParty(formData: FormData): Promise<void> {
 
 // ── Guests (the named people inside a party) ─────────────────────────────────
 
-/** Add a person to an existing party. */
+/** Add a person to an existing party (appended to the end of its order). */
 export async function addGuest(formData: FormData): Promise<void> {
   if (!(await guard())) return;
   const party_id = str(formData.get("party_id"));
@@ -160,10 +160,62 @@ export async function addGuest(formData: FormData): Promise<void> {
   if (!party_id || !person) return;
 
   const supabase = getSupabase();
+  // New people sort after the existing ones in the party.
+  const { count } = await supabase
+    .from(GUESTS_TABLE)
+    .select("id", { count: "exact", head: true })
+    .eq("party_id", party_id);
+
   const { error } = await supabase
     .from(GUESTS_TABLE)
-    .insert({ ...person, party_id });
+    .insert({ ...person, party_id, sort_order: count ?? 0 });
   if (error) console.error("Guest add failed:", error.message);
+  revalidate();
+}
+
+/**
+ * Move a person up or down within their party. Loads the party in its current
+ * order, swaps the target with its neighbor, then rewrites a clean 0..n-1
+ * sequence so the new order sticks even if existing sort_order values collide.
+ */
+export async function moveGuest(formData: FormData): Promise<void> {
+  if (!(await guard())) return;
+  const id = str(formData.get("id"));
+  const dir = str(formData.get("dir")); // "up" | "down"
+  if (!id || (dir !== "up" && dir !== "down")) return;
+
+  const supabase = getSupabase();
+  const { data: target, error: readErr } = await supabase
+    .from(GUESTS_TABLE)
+    .select("party_id")
+    .eq("id", id)
+    .single<{ party_id: string | null }>();
+  if (readErr || !target?.party_id) return;
+
+  const { data: members, error: listErr } = await supabase
+    .from(GUESTS_TABLE)
+    .select("id")
+    .eq("party_id", target.party_id)
+    .order("sort_order", { ascending: true })
+    .order("last_name", { ascending: true })
+    .order("first_name", { ascending: true });
+  if (listErr || !members) {
+    console.error("Guest move read failed:", listErr?.message);
+    return;
+  }
+
+  const ids = members.map((m) => m.id as string);
+  const i = ids.indexOf(id);
+  const j = dir === "up" ? i - 1 : i + 1;
+  if (i === -1 || j < 0 || j >= ids.length) return; // already at an edge
+  [ids[i], ids[j]] = [ids[j], ids[i]];
+
+  // Rewrite a clean 0..n-1 sequence (a few rows; safe regardless of prior values).
+  await Promise.all(
+    ids.map((gid, idx) =>
+      supabase.from(GUESTS_TABLE).update({ sort_order: idx }).eq("id", gid),
+    ),
+  );
   revalidate();
 }
 
