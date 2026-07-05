@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { isAuthed } from "@/lib/auth";
 import { isSupabaseConfigured } from "@/lib/supabase";
-import { getAddressBook, guestName } from "@/lib/guests";
+import { getAddressBook, partyLabel } from "@/lib/guests";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -59,15 +59,14 @@ export async function GET() {
   ];
   const lines = [header.join(",")];
   for (const p of parties) {
-    const names = p.guests.map(guestName).filter(Boolean);
-    const fullName = names[0] ?? p.household_label ?? "";
-    // Everyone after the first person shares the line as plus-ones / family.
-    const plusOnes = names.slice(1).join(", ");
+    // Use the party's mailing/envelope name as the full name, and leave the
+    // plus-one column blank (one recipient line per household).
+    const fullName = partyLabel(p);
     const street = [p.address_line1, p.address_line2].filter(Boolean).join(", ");
     lines.push(
       [
         csvCell(fullName),
-        csvCell(plusOnes),
+        csvCell(""),
         csvCell(street),
         csvCell(p.city ?? ""),
         csvCell(p.state ?? ""),
