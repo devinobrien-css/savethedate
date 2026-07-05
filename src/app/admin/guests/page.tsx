@@ -17,7 +17,12 @@ import AdminHeader from "../AdminHeader";
 import PartyForm from "./PartyForm";
 import PersonForm from "./PersonForm";
 import LinkControls, { type PartyOption } from "./LinkControls";
-import { DeletePartyButton, RemovePersonButton, UnlinkRsvpButton } from "./RowActions";
+import {
+  DeletePartyButton,
+  RemovePersonButton,
+  MoveGuestButton,
+  UnlinkRsvpButton,
+} from "./RowActions";
 
 export const metadata: Metadata = {
   title: "Guests Admin",
@@ -80,7 +85,15 @@ export default async function GuestsAdminPage() {
       <div className="mx-auto max-w-5xl px-6 py-12">
         <AdminHeader active="guests" />
 
-        <h1 className="mb-8 font-serif text-2xl">Guests &amp; Addresses</h1>
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <h1 className="font-serif text-2xl">Guests &amp; Addresses</h1>
+          <a
+            href="/api/admin/guests/export"
+            className="rounded-lg border border-neutral-700 px-4 py-2 text-xs uppercase tracking-[0.2em] text-neutral-200 transition-colors hover:bg-neutral-800"
+          >
+            Export CSV
+          </a>
+        </div>
 
         {loadError && (
           <p className="mb-6 rounded-lg border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
@@ -216,10 +229,15 @@ function PartyRow({ party }: { party: PartyWithGuests }) {
             <p className="mt-2 text-xs italic text-neutral-500">{party.notes}</p>
           )}
 
-          {/* The people in this party */}
+          {/* The people in this party (reorderable) */}
           <ul className="mt-3 space-y-2">
-            {party.guests.map((g) => (
-              <PersonRow key={g.id} guest={g} />
+            {party.guests.map((g, i) => (
+              <PersonRow
+                key={g.id}
+                guest={g}
+                isFirst={i === 0}
+                isLast={i === party.guests.length - 1}
+              />
             ))}
           </ul>
 
@@ -272,7 +290,15 @@ function PartyRow({ party }: { party: PartyWithGuests }) {
   );
 }
 
-function PersonRow({ guest }: { guest: Guest }) {
+function PersonRow({
+  guest,
+  isFirst,
+  isLast,
+}: {
+  guest: Guest;
+  isFirst: boolean;
+  isLast: boolean;
+}) {
   const name = guestName(guest) || "Unnamed guest";
 
   return (
@@ -291,6 +317,12 @@ function PersonRow({ guest }: { guest: Guest }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {!(isFirst && isLast) && (
+            <div className="flex items-center gap-1">
+              <MoveGuestButton id={guest.id} dir="up" disabled={isFirst} />
+              <MoveGuestButton id={guest.id} dir="down" disabled={isLast} />
+            </div>
+          )}
           <RemovePersonButton id={guest.id} name={name} />
         </div>
       </div>
