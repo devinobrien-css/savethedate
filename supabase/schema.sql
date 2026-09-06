@@ -72,7 +72,8 @@ create table if not exists public.guests (
   first_name      text not null,
   last_name       text,
   email           text,                 -- used to auto-suggest RSVP matches
-  notes           text                  -- person-level note (e.g. dietary, plus-one)
+  notes           text,                 -- person-level note (e.g. dietary, plus-one)
+  sort_order      integer not null default 0  -- order within the party (low first)
 );
 
 -- Same posture as the other tables: RLS on, no public policies. All access is
@@ -82,7 +83,7 @@ alter table public.guests  enable row level security;
 
 create index if not exists guests_name_idx     on public.guests (last_name, first_name);
 create index if not exists guests_email_idx    on public.guests (email);
-create index if not exists guests_party_id_idx  on public.guests (party_id);
+create index if not exists guests_party_id_idx  on public.guests (party_id, sort_order);
 create index if not exists parties_name_idx     on public.parties (household_label);
 
 -- Link a submitted RSVP to a party (the household it belongs to). One person
@@ -141,6 +142,20 @@ create table if not exists public.registry_claims (
 -- celebrate!"). Shown to the couple in the admin registry view.
 alter table public.registry_claims add column if not exists note text;
 
+-- Optional tracking number/link the gifter shares on the confirm page, so the
+-- couple (in an apartment) know when a package is arriving. Admin-only.
+alter table public.registry_claims add column if not exists tracking text;
+
+-- Pending-claim lifecycle. An unconfirmed claim expires after 72h (one reminder
+-- goes out at ~48h) so a typo'd email can't hold a gift forever.
+--   released_reason  — 'guest' | 'admin' | 'expired' | 'unsent' | null; lets the
+--                      confirm page distinguish "you released this" from "this
+--                      timed out".
+--   reminder_sent_at — when the single nudge was sent; also the idempotency
+--                      guard that stops a re-run sending twice.
+alter table public.registry_claims add column if not exists released_reason  text;
+alter table public.registry_claims add column if not exists reminder_sent_at timestamptz;
+
 -- Same posture as rsvps: RLS on, no public policies. All access is server-side
 -- via the service-role key, so the public anon key can neither read nor write.
 alter table public.registry_items  enable row level security;
@@ -157,6 +172,12 @@ create index if not exists registry_claims_item_idx
 create unique index if not exists registry_one_active_claim
   on public.registry_claims (item_id)
   where status <> 'released';
+
+-- The expiry sweep looks up pending claims by age; this partial index keeps that
+-- scan off the confirmed/released rows, which are the bulk of the table.
+create index if not exists registry_claims_pending_age_idx
+  on public.registry_claims (created_at)
+  where status = 'pending';
 
 
 -- ─────────────────────────────────────────────────────────────────────────

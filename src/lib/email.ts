@@ -2,6 +2,7 @@ import "server-only";
 import { Resend } from "resend";
 import { buildRsvpConfirmation, type Variant } from "@/emails/rsvpConfirmation";
 import { buildRegistryClaim } from "@/emails/registryClaim";
+import { buildRegistryClaimReminder } from "@/emails/registryClaimReminder";
 import { logEmail } from "@/lib/emailLog";
 
 /**
@@ -143,6 +144,60 @@ export async function sendRegistryClaimVerification(input: {
   }
   await logEmail({
     type: "registry_claim",
+    recipient: input.to,
+    subject,
+    status: "sent",
+    providerId: data?.id ?? null,
+  });
+}
+
+/**
+ * The single "still giving this?" nudge for a claim that was never confirmed,
+ * sent from the daily cron sweep. Best-effort: one guest's bounced reminder
+ * must not stop the rest of the batch, so failures are logged and rethrown for
+ * the caller to count rather than surfaced to anybody.
+ */
+export async function sendRegistryClaimReminder(input: {
+  to: string;
+  name: string;
+  itemTitle: string;
+  confirmUrl: string;
+  releaseUrl: string;
+}): Promise<void> {
+  const { subject } = buildRegistryClaimReminder(input);
+
+  if (!isEmailConfigured()) {
+    await logEmail({
+      type: "registry_claim_reminder",
+      recipient: input.to,
+      subject,
+      status: "skipped",
+      error: "Email is not configured (RESEND_API_KEY / RESEND_FROM).",
+    });
+    throw new Error("Email is not configured (set RESEND_API_KEY and RESEND_FROM).");
+  }
+
+  const { html, text } = buildRegistryClaimReminder(input);
+  const { data, error } = await client().emails.send({
+    from: process.env.RESEND_FROM!,
+    to: input.to,
+    subject,
+    html,
+    text,
+    ...deliverability(),
+  });
+  if (error) {
+    await logEmail({
+      type: "registry_claim_reminder",
+      recipient: input.to,
+      subject,
+      status: "failed",
+      error: error.message,
+    });
+    throw new Error(error.message);
+  }
+  await logEmail({
+    type: "registry_claim_reminder",
     recipient: input.to,
     subject,
     status: "sent",

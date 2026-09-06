@@ -14,11 +14,15 @@ import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 export const EMAIL_LOG_TABLE = "email_log";
 
 /** Stable identifiers for each kind of email we send. */
-export type EmailType = "rsvp_confirmation" | "registry_claim";
+export type EmailType =
+  | "rsvp_confirmation"
+  | "registry_claim"
+  | "registry_claim_reminder";
 
 export const EMAIL_TYPE_LABELS: Record<EmailType, string> = {
   rsvp_confirmation: "RSVP confirmation",
   registry_claim: "Registry claim",
+  registry_claim_reminder: "Registry claim reminder",
 };
 
 /**

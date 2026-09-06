@@ -1,16 +1,19 @@
 import { wedding, shippingAddressLines } from "@/config/site";
 
 /**
- * "Confirm your gift" verification email — sent when a guest marks a registry
- * item as purchased on /registry. They click to confirm (which locks the item
- * in for everyone) or to release it if they change their mind. Styled to match
- * the RSVP confirmation (see emails/rsvpConfirmation.ts): deep navy + gold over
- * ivory, table-based for broad mail-client support.
+ * "Still giving this?" reminder — the single nudge sent about two days after a
+ * guest marks a gift as theirs but never clicks the verification link. It is
+ * the warning that makes the automatic release fair: the gift goes back on the
+ * registry the next day unless they confirm.
+ *
+ * The load-bearing line is the one telling a guest who has *already bought* the
+ * gift to confirm anyway — that's the case where a silent release would end in
+ * the couple receiving two of something. Styled to match registryClaim.ts.
  */
 
 type EmailContent = { subject: string; html: string; text: string };
 
-type RegistryClaimInput = {
+type RegistryClaimReminderInput = {
   name: string;
   itemTitle: string;
   confirmUrl: string;
@@ -34,7 +37,9 @@ function escapeHtml(s: string): string {
     .replaceAll("'", "&#39;");
 }
 
-export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
+export function buildRegistryClaimReminder(
+  input: RegistryClaimReminderInput
+): EmailContent {
   const { confirmUrl, releaseUrl } = input;
   const p = palette;
   const name = escapeHtml(input.name || "there");
@@ -43,11 +48,8 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
   const divider = "rgba(0,0,0,0.07)";
   const shipTo = shippingAddressLines();
 
-  const subject = `Confirm your gift — ${input.itemTitle}`;
-  const preheader = `One click to confirm you're giving "${input.itemTitle}".`;
-
-  const eyebrow = (text: string, color: string, opacity: number) =>
-    `<div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:${color};opacity:${opacity};">${text}</div>`;
+  const subject = `Still giving ${input.itemTitle}?`;
+  const preheader = `One tap to keep "${input.itemTitle}" reserved — otherwise it goes back on the registry tomorrow.`;
 
   const btn = (href: string, label: string, fill: boolean) => {
     const skin = fill
@@ -73,7 +75,7 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
           <tr><td style="height:5px;background:${p.gold};font-size:0;line-height:0;">&nbsp;</td></tr>
           <tr>
             <td style="background:${p.ink};padding:46px 40px 40px;text-align:center;">
-              ${eyebrow("Registry & Gifts", "#ffffff", 0.6)}
+              <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:#ffffff;opacity:0.6;">Registry &amp; Gifts</div>
               <div style="font-family:Georgia,'Times New Roman',serif;font-style:italic;font-size:38px;line-height:1.1;color:#ffffff;margin-top:16px;">${escapeHtml(couple)}</div>
               <div style="width:46px;height:1px;background:rgba(255,255,255,0.35);margin:20px auto 18px;font-size:0;line-height:0;">&nbsp;</div>
               <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.78);">${escapeHtml(wedding.weddingDateLabel)} &nbsp;·&nbsp; ${escapeHtml(wedding.city)}</div>
@@ -83,7 +85,7 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
             <td style="padding:42px 44px 8px;font-family:Arial,Helvetica,sans-serif;color:${p.ink};">
               <p style="margin:0 0 16px;font-family:Georgia,'Times New Roman',serif;font-size:22px;color:${p.ink};">Hi ${name},</p>
               <p style="margin:0 0 28px;font-size:15px;line-height:1.65;color:${p.ink};opacity:0.82;">
-                Thank you so much — it means the world. Just one quick step: confirm the gift below so we can mark it as covered and no one else doubles up.
+                A couple of days ago you kindly marked a gift as yours, but we never heard back — so we wanted to check before doing anything.
               </p>
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${p.tint};border-radius:14px;">
                 <tr><td style="padding:20px 26px;">
@@ -91,17 +93,18 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
                   <div style="font-family:Georgia,'Times New Roman',serif;font-size:20px;color:${p.ink};margin-top:8px;">${item}</div>
                 </td></tr>
               </table>
-              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:34px;">
-                <tr><td align="center" style="padding-bottom:12px;">${btn(confirmUrl, "Confirm this gift", true)}</td></tr>
+              <p style="margin:26px 0 0;font-size:15px;line-height:1.65;color:${p.ink};opacity:0.82;">
+                <strong>If you&rsquo;ve already bought it, just tap below</strong> — that keeps it reserved so nobody else gives the same thing. Otherwise it goes back on the registry tomorrow, and that&rsquo;s completely fine.
+              </p>
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px;">
+                <tr><td align="center" style="padding-bottom:12px;">${btn(confirmUrl, "Yes — it's still mine", true)}</td></tr>
               </table>
               ${
                 shipTo
-                  ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px;background:${p.tint};border-radius:14px;">
+                  ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:26px;background:${p.tint};border-radius:14px;">
                 <tr><td style="padding:20px 26px;">
                   <div style="font-family:Arial,Helvetica,sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:${p.ink};opacity:0.5;">Where to ship it</div>
                   <div style="font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.55;color:${p.ink};margin-top:8px;">${shipTo.map((l) => escapeHtml(l)).join("<br>")}</div>
-                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:${p.ink};opacity:0.6;margin-top:12px;">No rush at all — whenever the gift ships is perfect.</div>
-                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.6;color:${p.ink};opacity:0.6;margin-top:12px;">We&rsquo;re in an apartment, so once it ships you can pop back here, tap <strong>Confirm this gift</strong> above, and add a tracking link — any time. Totally optional, but it helps us make sure it doesn&rsquo;t wander.</div>
                 </td></tr>
               </table>`
                   : ""
@@ -109,7 +112,7 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:30px;">
                 <tr><td style="border-top:1px solid ${divider};font-size:0;line-height:0;height:1px;">&nbsp;</td></tr>
                 <tr><td align="center" style="padding-top:26px;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:${p.ink};opacity:0.7;">
-                  Changed your mind, or clicked by accident?<br>You can release it so someone else can give it.
+                  Changed your mind? No need to do anything &mdash;<br>or release it now so someone else can give it.
                 </td></tr>
                 <tr><td align="center" style="padding-top:16px;">${btn(releaseUrl, "Release this gift", false)}</td></tr>
               </table>
@@ -139,21 +142,15 @@ export function buildRegistryClaim(input: RegistryClaimInput): EmailContent {
     "",
     `Hi ${input.name || "there"},`,
     "",
-    `Thank you so much! Please confirm your gift so we can mark it as covered:`,
+    "A couple of days ago you kindly marked a gift as yours, but we never heard back — so we wanted to check before doing anything.",
     "",
     `Gift: ${input.itemTitle}`,
     "",
-    `Confirm this gift: ${confirmUrl}`,
+    "If you've already bought it, just confirm below — that keeps it reserved so nobody else gives the same thing. Otherwise it goes back on the registry tomorrow, and that's completely fine.",
     "",
-    ...(shipTo
-      ? [
-          "Where to ship it (no rush):",
-          ...shipTo,
-          "",
-          "We're in an apartment — once it ships, you can reopen the confirm link above and add a tracking link any time. Optional, but it helps us make sure it doesn't wander.",
-          "",
-        ]
-      : []),
+    `Yes — it's still mine: ${confirmUrl}`,
+    "",
+    ...(shipTo ? ["Where to ship it:", ...shipTo, ""] : []),
     `Changed your mind? Release it so someone else can give it: ${releaseUrl}`,
     "",
     `With love and gratitude, ${couple}`,

@@ -17,3 +17,8 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Scheduled functions live in netlify/functions/. Each declares its own cron in
+# an exported `config` — see registry-sweep.mts, which triggers the daily
+# registry claim sweep (expire stale claims, send the one reminder).
+# It needs CRON_SECRET set in the site's environment variables.

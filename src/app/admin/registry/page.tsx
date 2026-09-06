@@ -5,6 +5,8 @@ import { isSupabaseConfigured } from "@/lib/supabase";
 import {
   getAdminRegistry,
   formatPrice,
+  isCoveringClaim,
+  isPendingExpired,
   type AdminRegistryItem,
 } from "@/lib/registry";
 import AdminHeader from "../AdminHeader";
@@ -55,10 +57,13 @@ export default async function RegistryAdminPage() {
     loadError = e instanceof Error ? e.message : "Failed to load registry.";
   }
 
-  // Stats track claimable gifts only — cash funds have no claim flow.
+  // Stats track claimable gifts only — cash funds have no claim flow. A claim
+  // that timed out doesn't count as covering, so these match the public page.
   const giftItems = items.filter((i) => i.kind !== "fund");
-  const covered = giftItems.filter((i) => i.claim).length;
-  const open = giftItems.filter((i) => i.is_active && !i.claim).length;
+  const covered = giftItems.filter((i) => i.claim && isCoveringClaim(i.claim)).length;
+  const open = giftItems.filter(
+    (i) => i.is_active && !(i.claim && isCoveringClaim(i.claim))
+  ).length;
 
   return (
     <Shell>
@@ -108,13 +113,19 @@ export default async function RegistryAdminPage() {
 function ItemRow({ item }: { item: AdminRegistryItem }) {
   const price = formatPrice(item.price_cents);
   const claim = item.claim;
-  const status = claim
-    ? claim.status === "confirmed"
-      ? { label: "Purchased", cls: "bg-emerald-500/15 text-emerald-300" }
-      : { label: "Reserved", cls: "bg-amber-500/15 text-amber-300" }
-    : item.is_active
-      ? { label: "Open", cls: "bg-neutral-700/40 text-neutral-300" }
-      : { label: "Hidden", cls: "bg-neutral-800 text-neutral-500" };
+  // A pending claim past its TTL is on its way out (the next claim or cron tick
+  // clears it) and the public page already shows the gift as available — so
+  // flag it here rather than calling it Reserved.
+  const expired = claim ? isPendingExpired(claim) : false;
+  const status = expired
+    ? { label: "Never confirmed", cls: "bg-neutral-800 text-neutral-400" }
+    : claim
+      ? claim.status === "confirmed"
+        ? { label: "Purchased", cls: "bg-emerald-500/15 text-emerald-300" }
+        : { label: "Reserved", cls: "bg-amber-500/15 text-amber-300" }
+      : item.is_active
+        ? { label: "Open", cls: "bg-neutral-700/40 text-neutral-300" }
+        : { label: "Hidden", cls: "bg-neutral-800 text-neutral-500" };
 
   return (
     <li className="rounded-lg border border-neutral-800 bg-neutral-900">
@@ -144,13 +155,34 @@ function ItemRow({ item }: { item: AdminRegistryItem }) {
           </p>
           {claim && (
             <p className="mt-1 text-xs text-neutral-400">
-              {claim.status === "confirmed" ? "Claimed by" : "Pending from"}{" "}
+              {claim.status === "confirmed"
+                ? "Claimed by"
+                : expired
+                  ? "Never confirmed by"
+                  : "Pending from"}{" "}
               <span className="text-neutral-200">{claim.claimer_name}</span>{" "}
               <span className="text-neutral-500">({claim.claimer_email})</span>
             </p>
           )}
           {claim?.note && (
             <p className="mt-1 text-xs italic text-neutral-400">“{claim.note}”</p>
+          )}
+          {claim?.tracking && (
+            <p className="mt-1 truncate text-xs text-sky-300">
+              📦 Tracking:{" "}
+              {/^https?:\/\//i.test(claim.tracking) ? (
+                <a
+                  href={claim.tracking}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline underline-offset-2 hover:text-sky-200"
+                >
+                  {claim.tracking}
+                </a>
+              ) : (
+                <span className="text-sky-200">{claim.tracking}</span>
+              )}
+            </p>
           )}
         </div>
         <div className="flex items-center gap-2">

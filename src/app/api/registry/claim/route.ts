@@ -3,20 +3,19 @@ import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import {
   REGISTRY_ITEMS_TABLE,
   REGISTRY_CLAIMS_TABLE,
+  MAX_ACTIVE_CLAIMS_PER_EMAIL,
+  countActiveClaimsForEmail,
+  expireStalePendingClaims,
   type RegistryItem,
 } from "@/lib/registry";
 import { signToken } from "@/lib/token";
+import { siteBase } from "@/lib/siteUrl";
 import { sendRegistryClaimVerification } from "@/lib/email";
 
 export const runtime = "nodejs";
 
 function str(v: FormDataEntryValue | null): string {
   return typeof v === "string" ? v.trim() : "";
-}
-
-/** Absolute base for email links: SITE_URL if set, else this request's origin. */
-function siteBase(request: Request): string {
-  return (process.env.SITE_URL || new URL(request.url).origin).replace(/\/+$/, "");
 }
 
 export async function POST(request: Request) {
@@ -56,6 +55,24 @@ export async function POST(request: Request) {
   }
 
   const supabase = getSupabase();
+
+  // Clear any claim that was never confirmed and has aged out. Doing this first
+  // means a stale row can't trip the one-active-claim index below, and keeps
+  // the count that follows honest.
+  await expireStalePendingClaims();
+
+  // One address can only hold so many gifts at once. This is the cheap brake on
+  // someone working through the catalog with throwaway addresses — every claim
+  // costs us an email send, and unconfirmed ones tie up gifts until they expire.
+  if ((await countActiveClaimsForEmail(email)) >= MAX_ACTIVE_CLAIMS_PER_EMAIL) {
+    return NextResponse.json(
+      {
+        error:
+          "You're already holding several gifts. Please confirm those first, or get in touch and we'll help.",
+      },
+      { status: 429 }
+    );
+  }
 
   // Confirm the item exists and is still active.
   const { data: itemRow, error: itemErr } = await supabase
@@ -119,7 +136,11 @@ export async function POST(request: Request) {
     console.error("Registry verification email failed:", e);
     await supabase
       .from(REGISTRY_CLAIMS_TABLE)
-      .update({ status: "released", released_at: new Date().toISOString() })
+      .update({
+        status: "released",
+        released_at: new Date().toISOString(),
+        released_reason: "unsent",
+      })
       .eq("id", claimId);
     return NextResponse.json(
       { error: "We couldn't send the confirmation email. Please try again." },

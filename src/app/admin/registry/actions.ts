@@ -140,7 +140,11 @@ export async function releaseClaim(formData: FormData): Promise<void> {
   const supabase = getSupabase();
   const { error } = await supabase
     .from(REGISTRY_CLAIMS_TABLE)
-    .update({ status: "released", released_at: new Date().toISOString() })
+    .update({
+      status: "released",
+      released_at: new Date().toISOString(),
+      released_reason: "admin",
+    })
     .eq("id", claimId);
   if (error) console.error("Registry claim release failed:", error.message);
   revalidateRegistry();
