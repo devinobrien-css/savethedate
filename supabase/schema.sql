@@ -32,6 +32,11 @@ alter table public.rsvps add column if not exists phone         text;
 alter table public.rsvps add column if not exists sms_opt_in    boolean not null default false;
 alter table public.rsvps add column if not exists sms_opted_out boolean not null default false;
 
+-- Allergies / dietary restrictions for the whole party (free text, null when blank),
+-- and whether the guest asked us to hold a room in the hotel block for them.
+alter table public.rsvps add column if not exists dietary      text;
+alter table public.rsvps add column if not exists room_request boolean not null default false;
+
 
 -- ─────────────────────────────────────────────────────────────────────────
 --  PARTIES & GUESTS / ADDRESS BOOK — the mailing list the couple curates by

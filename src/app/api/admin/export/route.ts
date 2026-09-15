@@ -42,6 +42,8 @@ export async function GET() {
     "Email",
     "Attending",
     "Party size",
+    "Room requested",
+    "Dietary",
     "Note",
     "Received",
   ];
@@ -54,6 +56,8 @@ export async function GET() {
         csvCell(r.email),
         csvCell(r.attending ? "Yes" : "No"),
         csvCell(r.attending ? r.party_size : 0),
+        csvCell(r.attending && r.room_request ? "Yes" : "No"),
+        csvCell(r.attending ? r.dietary ?? "" : ""),
         csvCell(r.note ?? ""),
         csvCell(r.created_at),
       ].join(",")

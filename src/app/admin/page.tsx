@@ -76,6 +76,7 @@ export default async function AdminPage() {
   const attending = rsvps.filter((r) => r.attending);
   const declined = rsvps.filter((r) => !r.attending);
   const totalGuests = attending.reduce((sum, r) => sum + (r.party_size || 0), 0);
+  const roomsRequested = attending.filter((r) => r.room_request).length;
 
   return (
     <Shell>
@@ -98,11 +99,12 @@ export default async function AdminPage() {
           </p>
         )}
 
-        <section className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <section className="mb-10 grid grid-cols-2 gap-4 sm:grid-cols-5">
           <Stat label="Responses" value={rsvps.length} />
           <Stat label="Accepting" value={attending.length} />
           <Stat label="Declining" value={declined.length} />
           <Stat label="Total guests" value={totalGuests} />
+          <Stat label="Rooms requested" value={roomsRequested} />
         </section>
 
         {rsvps.length === 0 ? (
@@ -118,6 +120,8 @@ export default async function AdminPage() {
                   <th className="px-4 py-3 font-medium">Email</th>
                   <th className="px-4 py-3 font-medium">Reply</th>
                   <th className="px-4 py-3 font-medium">Party</th>
+                  <th className="px-4 py-3 font-medium">Room</th>
+                  <th className="px-4 py-3 font-medium">Dietary</th>
                   <th className="px-4 py-3 font-medium">Note</th>
                   <th className="px-4 py-3 font-medium">Received</th>
                   <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -143,6 +147,12 @@ export default async function AdminPage() {
                     </td>
                     <td className="px-4 py-3 text-neutral-300">
                       {r.attending ? r.party_size : "—"}
+                    </td>
+                    <td className="px-4 py-3 text-neutral-300">
+                      {r.attending && r.room_request ? "Requested" : "—"}
+                    </td>
+                    <td className="max-w-xs px-4 py-3 text-neutral-400">
+                      {r.attending && r.dietary ? r.dietary : "—"}
                     </td>
                     <td className="max-w-xs px-4 py-3 text-neutral-400">
                       {r.note || "—"}

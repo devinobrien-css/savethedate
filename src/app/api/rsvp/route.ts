@@ -30,6 +30,8 @@ export async function POST(request: Request) {
   const email = str(data.get("email")).toLowerCase();
   const attendingRaw = str(data.get("attending"));
   const note = str(data.get("note"));
+  const dietary = str(data.get("dietary")).slice(0, 1000);
+  const roomRequest = str(data.get("roomRequest")) === "on";
   // Phone is optional and only kept when it parses to a US E.164 number. SMS
   // opt-in is meaningful only with a usable number; a bad/blank phone clears it.
   const phone = toE164(str(data.get("phone")));
@@ -65,6 +67,9 @@ export async function POST(request: Request) {
         attending,
         party_size: attending ? Math.max(1, partySize) : 0,
         note: note || null,
+        // Only meaningful for attendees; a decline clears any earlier answer.
+        dietary: attending && dietary ? dietary : null,
+        room_request: attending && roomRequest,
         phone,
         sms_opt_in: smsOptIn,
       },

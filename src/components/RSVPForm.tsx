@@ -243,19 +243,53 @@ export default function RSVPForm({ variant }: { variant: Variant }) {
       </div>
 
       {attending === "yes" && (
-        <div className="animate-fade-up">
-          <label className={`block mb-2 ${t.label}`}>Number in your party</label>
-          <select
-            value={guests}
-            onChange={(e) => setGuests(e.target.value)}
-            className={`${inputBase} ${t.field}`}
-          >
-            {[1, 2, 3, 4, 5].map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </select>
+        <div className="animate-fade-up space-y-6">
+          <div>
+            <label className={`block mb-2 ${t.label}`}>Number in your party</label>
+            <select
+              value={guests}
+              onChange={(e) => setGuests(e.target.value)}
+              className={`${inputBase} ${t.field}`}
+            >
+              {[1, 2].map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className={`block mb-2 ${t.label}`}>
+              Allergies or dietary restrictions (optional)
+            </label>
+            <textarea
+              name="dietary"
+              rows={2}
+              maxLength={1000}
+              placeholder="e.g. Devin — tree nut allergy; Sam — vegetarian"
+              className={`${inputBase} ${t.field} resize-none`}
+            />
+            <p className="mt-2 font-sans text-[11px] opacity-50 leading-relaxed">
+              Please note who each one applies to so we can let the caterer know.
+            </p>
+          </div>
+
+          <label className="flex items-start gap-2.5 cursor-pointer">
+            <input
+              name="roomRequest"
+              type="checkbox"
+              className="mt-0.5 h-4 w-4 flex-none accent-current"
+            />
+            <span className="font-sans text-sm leading-relaxed">
+              Please reserve a room for me in the room block, if available.
+              <span className="block mt-1 text-[11px] opacity-50">
+                Rooms are $250 and limited. This is a request, not a booking
+                &mdash; we&apos;ll follow up with you to confirm before anything
+                is reserved.
+              </span>
+            </span>
+          </label>
         </div>
       )}
 

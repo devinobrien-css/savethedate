@@ -16,6 +16,10 @@ export type RSVP = {
   attending: boolean;
   party_size: number;
   note: string | null;
+  // Allergies / dietary restrictions for the party (free text). Null when blank.
+  dietary: string | null;
+  // Guest asked us to reserve a room in the hotel block (a request, not a booking).
+  room_request: boolean;
   phone: string | null;
   sms_opt_in: boolean;
   sms_opted_out: boolean;
