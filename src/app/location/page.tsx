@@ -128,8 +128,9 @@ export default function LocationPage() {
             Shuttle service provided
           </p>
           <p className="mt-1.5 text-sm leading-relaxed text-v1-denim/90">
-            Buses carry everyone from The Penn Club to the ceremony and back —
-            no need to drive, park, or arrange a car. Just hop aboard.
+            Buses leave The Penn Club at 2:45 PM for the ceremony and bring
+            everyone back for the reception — no need to drive, park, or
+            arrange a car. Just hop aboard.
           </p>
         </div>
       </div>
@@ -149,8 +150,7 @@ export default function LocationPage() {
             <span className="h-2.5 w-2.5 rounded-full bg-v1-blush" /> The Penn Club
           </span>
           <span className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 rounded-full border border-dashed border-v1-denim" />
-            Ceremony (TBA)
+            <span className="h-2.5 w-2.5 rounded-full bg-v1-blush" /> St. Vincent Ferrer
           </span>
           <span className="flex items-center gap-2">
             <span className="h-2.5 w-2.5 rounded-full bg-v1-navy" /> Grand Central

@@ -50,11 +50,11 @@ export type WeddingDetails = {
 export const wedding: WeddingDetails = {
   partnerA: "Devin",
   partnerB: "Rebecca",
-  weddingDateISO: "2027-07-17T16:00:00",
+  weddingDateISO: "2027-07-17T14:45:00",
   weddingDateLabel: "July 17, 2027",
   dateStylized: "7.17.27",
-  ceremonyTime: "Time to be announced",
-  durationHours: 6,
+  ceremonyTime: "3:00 PM",
+  durationHours: 9,
   venueName: "The Penn Club",
   venueAddress: "30 West 44th Street, New York, NY 10036",
   city: "Manhattan, New York",
@@ -92,22 +92,23 @@ export type ScheduleStop = {
 
 export const daySchedule: ScheduleStop[] = [
   {
-    time: "Time TBA",
+    time: "Before 2:45 PM",
     title: "Gather at The Penn Club",
-    detail: "30 West 44th Street — where the day begins.",
+    detail:
+      "Optional — stop by 30 West 44th Street to check coats and bags before the shuttle leaves.",
     icon: "toast",
   },
   {
-    time: "",
+    time: "2:45 PM",
     title: "Shuttle to the ceremony",
-    detail: "Buses take us from The Penn Club to the church.",
+    detail: "Buses depart The Penn Club for the church.",
     icon: "bus",
     transit: true,
   },
   {
     time: "3:00 PM",
     title: "Ceremony",
-    detail: "At the church — location to be announced.",
+    detail: "St. Vincent Ferrer Church — Lexington Avenue at 65th Street.",
     icon: "rings",
   },
   {
@@ -118,7 +119,7 @@ export const daySchedule: ScheduleStop[] = [
     transit: true,
   },
   {
-    time: "6:00 PM",
+    time: "5:30 PM",
     title: "Cocktail Hour",
     detail: "The Penn Club.",
     icon: "martini",
@@ -136,9 +137,9 @@ export const daySchedule: ScheduleStop[] = [
     icon: "music",
   },
   {
-    time: "Time TBA",
+    time: "10:00 AM",
     title: "Farewell Brunch",
-    detail: "A relaxed send-off before you head home — details to come.",
+    detail: "A relaxed send-off before you head home — location to come.",
     icon: "coffee",
     dayLabel: "The Next Morning",
   },
@@ -149,11 +150,10 @@ export const daySchedule: ScheduleStop[] = [
  * essentials in a single scan. The timeline below is the full detail.
  */
 export const locationSummary =
-  "Ceremony 3 PM · Reception at The Penn Club · shuttles provided";
+  "Ceremony 3 PM at St. Vincent Ferrer · Reception at The Penn Club · shuttles provided";
 
 /**
- * Pins for the map on the Location & Time page. The church is a placeholder
- * until the venue is confirmed — update its lat/lng (or set show:false) then.
+ * Pins for the map on the Location & Time page. Set show:false to hide one.
  */
 export type MapPinKind = "venue" | "tentative" | "landmark";
 
@@ -187,13 +187,12 @@ export const mapPins: MapPin[] = [
     mapsQuery: "The Penn Club, 30 West 44th Street, New York, NY",
   },
   {
-    // Placeholder in the East 80s (Upper East Side) — replace with the real
-    // church when confirmed. Around East 81st St & Park Ave.
-    lat: 40.7768,
-    lng: -73.9575,
-    label: "Ceremony",
-    sublabel: "Church · East 80s, TBA",
-    kind: "tentative",
+    lat: 40.7651,
+    lng: -73.9658,
+    label: "St. Vincent Ferrer",
+    sublabel: "Ceremony · Lexington Ave at 65th St",
+    kind: "venue",
+    mapsQuery: "Church of St. Vincent Ferrer, 869 Lexington Avenue, New York, NY",
   },
   {
     lat: 40.75273,

@@ -27,6 +27,10 @@ body {
 .leaflet-container {
   background: #f3ecdc; /* v1 paper, shows while tiles load */
   font-family: inherit;
+  /* Leaflet's panes/controls use z-index up to 1000; contain them so they
+     don't paint over the fixed bottom nav (z-50) as the page scrolls. */
+  isolation: isolate;
+  z-index: 0;
 }
 /* Soften the bright OSM tiles to sit with the ivory palette */
 .leaflet-tile-pane {

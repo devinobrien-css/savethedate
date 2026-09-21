@@ -108,7 +108,7 @@ export default function LocationMap() {
     <div
       ref={ref}
       className="h-[360px] w-full overflow-hidden rounded-lg border border-v1-ink/10 bg-v1-paper sm:h-[440px]"
-      aria-label="Map showing The Penn Club, the ceremony, and Grand Central Terminal"
+      aria-label="Map showing The Penn Club, St. Vincent Ferrer Church, and Grand Central Terminal"
       role="img"
     />
   );
