@@ -8,7 +8,7 @@ import {
 } from "@/lib/supabase";
 import { wedding } from "@/config/site";
 import LoginForm from "./LoginForm";
-import DeleteRsvpButton from "./DeleteRsvpButton";
+import RsvpRow from "./RsvpRow";
 import AdminHeader from "./AdminHeader";
 
 export const metadata: Metadata = {
@@ -129,50 +129,15 @@ export default async function AdminPage() {
               </thead>
               <tbody className="divide-y divide-neutral-800">
                 {rsvps.map((r) => (
-                  <tr key={r.id} className="hover:bg-neutral-900/60">
-                    <td className="px-4 py-3 font-medium text-neutral-100">
-                      {r.first_name} {r.last_name}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-400">{r.email}</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 text-[11px] font-medium ${
-                          r.attending
-                            ? "bg-emerald-500/15 text-emerald-300"
-                            : "bg-neutral-700/40 text-neutral-300"
-                        }`}
-                      >
-                        {r.attending ? "Accepts" : "Declines"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-neutral-300">
-                      {r.attending ? r.party_size : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-neutral-300">
-                      {r.attending && r.room_request ? "Requested" : "—"}
-                    </td>
-                    <td className="max-w-xs px-4 py-3 text-neutral-400">
-                      {r.attending && r.dietary ? r.dietary : "—"}
-                    </td>
-                    <td className="max-w-xs px-4 py-3 text-neutral-400">
-                      {r.note || "—"}
-                    </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-neutral-500">
-                      {new Date(r.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end">
-                        <DeleteRsvpButton
-                          id={r.id}
-                          name={`${r.first_name} ${r.last_name}`}
-                        />
-                      </div>
-                    </td>
-                  </tr>
+                  <RsvpRow
+                    key={r.id}
+                    r={r}
+                    received={new Date(r.created_at).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  />
                 ))}
               </tbody>
             </table>
